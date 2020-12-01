@@ -16,330 +16,362 @@ using System.Linq;
 using System.Text;
 using System.IO;
 
-namespace ME.GD.Parsers.Csv {
+namespace ME.GD.Parsers {
 
-	/// <summary>
-	/// Fast and memory efficient implementation of CSV reader (3x times faster than CsvHelper).
-	/// </summary>
-	/// <remarks>API is similar to CSVHelper CsvReader.</remarks>
-	public class CsvReader {
+    /// <summary>
+    /// Fast and memory efficient implementation of CSV reader (3x times faster than CsvHelper).
+    /// </summary>
+    /// <remarks>API is similar to CSVHelper CsvReader.</remarks>
+    public class CsvReader {
 
-		public string Delimiter { get; private set; }
-		int delimLength;
+        public string Delimiter { get; private set; }
+        private int delimLength;
 
-		/// <summary>
-		/// Size of the circular buffer. Buffer size limits max length of the CSV line that can be processed. 
-		/// </summary>
-		/// <remarks>Default buffer size is 32kb.</remarks>
-		public int BufferSize { get; set; } = 32768;
+        /// <summary>
+        /// Size of the circular buffer. Buffer size limits max length of the CSV line that can be processed. 
+        /// </summary>
+        /// <remarks>Default buffer size is 32kb.</remarks>
+        public int BufferSize { get; set; } = 32768;
 
-		/// <summary>
-		/// If true start/end spaces are excluded from field values (except values in quotes). True by default.
-		/// </summary>
-		public bool TrimFields { get; set; } = true;
+        /// <summary>
+        /// If true start/end spaces are excluded from field values (except values in quotes). True by default.
+        /// </summary>
+        public bool TrimFields { get; set; } = true;
 
-		TextReader rdr;
+        private TextReader rdr;
 
-		public CsvReader(TextReader rdr) : this(rdr, ",") {
-		}
+        public CsvReader(TextReader rdr) : this(rdr, ",") { }
 
-		public CsvReader(TextReader rdr, string delimiter) {
-			this.rdr = rdr;
-			Delimiter = delimiter;
-			delimLength = delimiter.Length;
+        public CsvReader(TextReader rdr, string delimiter) {
+            this.rdr = rdr;
+            this.Delimiter = delimiter;
+            this.delimLength = delimiter.Length;
 
-			if (delimLength == 0)
-				throw new ArgumentException("Delimiter cannot be empty.");
-		}
+            if (this.delimLength == 0) {
+                throw new ArgumentException("Delimiter cannot be empty.");
+            }
+        }
 
-		char[] buffer = null;
-		int bufferLength;
-		int bufferLoadThreshold;
-		int lineStartPos = 0;
-		int actualBufferLen = 0;
-		List<Field> fields = null;
-		int fieldsCount = 0;
-		int linesRead = 0;
+        private char[] buffer = null;
+        private int bufferLength;
+        private int bufferLoadThreshold;
+        private int lineStartPos = 0;
+        private int actualBufferLen = 0;
+        private List<Field> fields = null;
+        private int fieldsCount = 0;
+        private int linesRead = 0;
 
-		private int ReadBlockAndCheckEof(char[] buffer, int start, int len, ref bool eof) {
-			if (len == 0)
-				return 0;
-			var read = rdr.ReadBlock(buffer, start, len);
-			if (read < len)
-				eof = true;
-			return read;
-		}
+        private int ReadBlockAndCheckEof(char[] buffer, int start, int len, ref bool eof) {
+            if (len == 0) {
+                return 0;
+            }
 
-		private bool FillBuffer() {
-			var eof = false;
-			var toRead = bufferLength - actualBufferLen;
-			if (toRead>=bufferLoadThreshold) {
-				int freeStart = (lineStartPos + actualBufferLen) % buffer.Length;
-				if (freeStart>=lineStartPos) {
-					actualBufferLen += ReadBlockAndCheckEof(buffer, freeStart, buffer.Length - freeStart, ref eof);
-					if (lineStartPos>0)
-						actualBufferLen += ReadBlockAndCheckEof(buffer, 0, lineStartPos, ref eof);
-				} else {
-					actualBufferLen += ReadBlockAndCheckEof(buffer, freeStart, toRead, ref eof);
-				}
-			}
-			return eof;
-		}
+            var read = this.rdr.ReadBlock(buffer, start, len);
+            if (read < len) {
+                eof = true;
+            }
 
-		private string GetLineTooLongMsg() {
-			return String.Format("CSV line #{1} length exceedes buffer size ({0})", BufferSize, linesRead);
-		}
+            return read;
+        }
 
-		private int ReadQuotedFieldToEnd(int start, int maxPos, bool eof, ref int escapedQuotesCount) {
-			int pos = start;
-			int chIdx;
-			char ch;
-			for (; pos<maxPos; pos++) {
-				chIdx = pos < bufferLength ? pos : pos % bufferLength;
-				ch = buffer[chIdx];
-				if (ch=='\"') {
-					bool hasNextCh = (pos + 1) < maxPos;
-					if (hasNextCh && buffer[(pos + 1) % bufferLength] == '\"') {
-						// double quote inside quote = just a content
-						pos++;
-						escapedQuotesCount++;
-					} else {
-						return pos;
-					}
-				}
-			}
-			if (eof) {
-				// this is incorrect CSV as quote is not closed
-				// but in case of EOF lets ignore that
-				return pos-1;
-			}
-			throw new InvalidDataException(GetLineTooLongMsg());
-		}
+        private bool FillBuffer() {
+            var eof = false;
+            var toRead = this.bufferLength - this.actualBufferLen;
+            if (toRead >= this.bufferLoadThreshold) {
+                var freeStart = (this.lineStartPos + this.actualBufferLen) % this.buffer.Length;
+                if (freeStart >= this.lineStartPos) {
+                    this.actualBufferLen += this.ReadBlockAndCheckEof(this.buffer, freeStart, this.buffer.Length - freeStart, ref eof);
+                    if (this.lineStartPos > 0) {
+                        this.actualBufferLen += this.ReadBlockAndCheckEof(this.buffer, 0, this.lineStartPos, ref eof);
+                    }
+                } else {
+                    this.actualBufferLen += this.ReadBlockAndCheckEof(this.buffer, freeStart, toRead, ref eof);
+                }
+            }
 
-		private bool ReadDelimTail(int start, int maxPos, ref int end) {
-			int pos;
-			int idx;
-			int offset = 1;
-			for (; offset<delimLength; offset++) {
-				pos = start + offset;
-				idx = pos < bufferLength ? pos : pos % bufferLength;
-				if (pos >= maxPos || buffer[idx] != Delimiter[offset])
-					return false;
-			}
-			end = start + offset -1;
-			return true;
-		}
+            return eof;
+        }
 
-		private Field GetOrAddField(int startIdx) {
-			fieldsCount++;
-			while (fieldsCount > fields.Count)
-				fields.Add(new Field());
-			var f = fields[fieldsCount-1];
-			f.Reset(startIdx);
-			return f;
-		}
+        private string GetLineTooLongMsg() {
+            return String.Format("CSV line #{1} length exceedes buffer size ({0})", this.BufferSize, this.linesRead);
+        }
 
-		public int FieldsCount {
-			get {
-				return fieldsCount;
-			}
-		}
+        private int ReadQuotedFieldToEnd(int start, int maxPos, bool eof, ref int escapedQuotesCount) {
+            var pos = start;
+            int chIdx;
+            char ch;
+            for (; pos < maxPos; pos++) {
+                chIdx = pos < this.bufferLength ? pos : pos % this.bufferLength;
+                ch = this.buffer[chIdx];
+                if (ch == '\"') {
+                    var hasNextCh = pos + 1 < maxPos;
+                    if (hasNextCh && this.buffer[(pos + 1) % this.bufferLength] == '\"') {
+                        // double quote inside quote = just a content
+                        pos++;
+                        escapedQuotesCount++;
+                    } else {
+                        return pos;
+                    }
+                }
+            }
 
-		public string this[int idx] {
-			get {
-				if (idx < fieldsCount) {
-					var f = fields[idx];
-					return fields[idx].GetValue(buffer);
-				}
-				return null;
-			}
-		}
+            if (eof) {
+                // this is incorrect CSV as quote is not closed
+                // but in case of EOF lets ignore that
+                return pos - 1;
+            }
 
-		public int GetValueLength(int idx) {
-			if (idx < fieldsCount) {
-				var f = fields[idx];
-				return f.Quoted ? f.Length-f.EscapedQuotesCount : f.Length;
-			}
-			return -1;
-		}
+            throw new InvalidDataException(this.GetLineTooLongMsg());
+        }
 
-		public void ProcessValueInBuffer(int idx, Action<char[],int,int> handler) {
-			if (idx < fieldsCount) {
-				var f = fields[idx];
-				if ((f.Quoted && f.EscapedQuotesCount > 0) || f.End>=bufferLength) {
-					var chArr = f.GetValue(buffer).ToCharArray();
-					handler(chArr, 0, chArr.Length);
-				} else if (f.Quoted) {
-					handler(buffer, f.Start + 1, f.Length - 2);
-				} else { 
-					handler(buffer, f.Start, f.Length);
-				}
-			}
-		}
+        private bool ReadDelimTail(int start, int maxPos, ref int end) {
+            int pos;
+            int idx;
+            var offset = 1;
+            for (; offset < this.delimLength; offset++) {
+                pos = start + offset;
+                idx = pos < this.bufferLength ? pos : pos % this.bufferLength;
+                if (pos >= maxPos || this.buffer[idx] != this.Delimiter[offset]) {
+                    return false;
+                }
+            }
 
-		public bool Read() {
-			if (fields == null) {
-				fields = new List<Field>();
-				fieldsCount = 0;
-			}
-			if (buffer==null) {
-				bufferLoadThreshold = Math.Min(BufferSize, 8192);
-				bufferLength = BufferSize + bufferLoadThreshold;
-				buffer = new char[bufferLength];
-				lineStartPos = 0;
-				actualBufferLen = 0;
-			}
+            end = start + offset - 1;
+            return true;
+        }
 
-			var eof = FillBuffer();
+        private Field GetOrAddField(int startIdx) {
+            this.fieldsCount++;
+            while (this.fieldsCount > this.fields.Count) {
+                this.fields.Add(new Field());
+            }
 
-			fieldsCount = 0;
-			if (actualBufferLen <= 0) {
-				return false; // no more data
-			}
-			linesRead++;
+            var f = this.fields[this.fieldsCount - 1];
+            f.Reset(startIdx);
+            return f;
+        }
 
-			int maxPos = lineStartPos + actualBufferLen;
-			int charPos = lineStartPos;
+        public int FieldsCount {
+            get {
+                return this.fieldsCount;
+            }
+        }
 
-			var currentField = GetOrAddField(charPos);
-			bool ignoreQuote = false;
-			char delimFirstChar = Delimiter[0];
-			bool trimFields = TrimFields;
+        public string this[int idx] {
+            get {
+                if (idx < this.fieldsCount) {
+                    var f = this.fields[idx];
+                    return this.fields[idx].GetValue(this.buffer);
+                }
 
-			int charBufIdx;
-			char ch;
-			for (; charPos < maxPos; charPos++) {
-				charBufIdx = charPos<bufferLength ? charPos : charPos % bufferLength;
-				ch = buffer[charBufIdx];
-				switch (ch) {
-					case '\"':
-						if (ignoreQuote) {
-							currentField.End = charPos;
-						} else if (currentField.Quoted || currentField.Length>0) {
-							// current field already is quoted = lets treat quotes as usual chars
-							currentField.End = charPos;
-							currentField.Quoted = false;
-							ignoreQuote = true;
-						} else { 
-							var endQuotePos = ReadQuotedFieldToEnd(charPos + 1, maxPos, eof, ref currentField.EscapedQuotesCount);
-							currentField.Start = charPos;
-							currentField.End = endQuotePos;
-							currentField.Quoted = true;
-							charPos = endQuotePos;
-						}
-						break;
-					case '\r':
-						if ((charPos + 1) < maxPos && buffer[(charPos + 1) % bufferLength] == '\n') {
-							// \r\n handling
-							charPos++;
-						}
-						// in some files only \r used as line separator - lets allow that
-						charPos++;
-						goto LineEnded;
-					case '\n':
-						charPos++;
-						goto LineEnded;
-					default:
-						if (ch == delimFirstChar && (delimLength == 1 || ReadDelimTail(charPos, maxPos, ref charPos))) {
-							currentField = GetOrAddField(charPos+1);
-							ignoreQuote = false;
-							continue;
-						}
-						// space
-						if (ch==' ' && trimFields) {
-							continue; // do nothing
-						}
+                return null;
+            }
+        }
 
-						// content char
-						if (currentField.Length==0) {
-							currentField.Start = charPos;
-						}
+        public int GetValueLength(int idx) {
+            if (idx < this.fieldsCount) {
+                var f = this.fields[idx];
+                return f.Quoted ? f.Length - f.EscapedQuotesCount : f.Length;
+            }
 
-						if (currentField.Quoted) {
-							// non-space content after quote = treat quotes as part of content
-							currentField.Quoted = false;
-							ignoreQuote = true;
-						}
-						currentField.End = charPos;
-						break;
-				}
+            return -1;
+        }
 
-			}
-			if (!eof) {
-				// line is not finished, but whole buffer was processed and not EOF
-				throw new InvalidDataException(GetLineTooLongMsg());
-			}
-		LineEnded:
-			actualBufferLen -= charPos - lineStartPos;
-			lineStartPos = charPos%bufferLength;
+        public void ProcessValueInBuffer(int idx, Action<char[], int, int> handler) {
+            if (idx < this.fieldsCount) {
+                var f = this.fields[idx];
+                if (f.Quoted && f.EscapedQuotesCount > 0 || f.End >= this.bufferLength) {
+                    var chArr = f.GetValue(this.buffer).ToCharArray();
+                    handler(chArr, 0, chArr.Length);
+                } else if (f.Quoted) {
+                    handler(this.buffer, f.Start + 1, f.Length - 2);
+                } else {
+                    handler(this.buffer, f.Start, f.Length);
+                }
+            }
+        }
 
-			if (fieldsCount==1 && fields[0].Length==0) {
-				// skip empty lines
-				return Read();
-			}
+        public bool Read() {
+            if (this.fields == null) {
+                this.fields = new List<Field>();
+                this.fieldsCount = 0;
+            }
 
-			return true;
-		}
+            if (this.buffer == null) {
+                this.bufferLoadThreshold = Math.Min(this.BufferSize, 8192);
+                this.bufferLength = this.BufferSize + this.bufferLoadThreshold;
+                this.buffer = new char[this.bufferLength];
+                this.lineStartPos = 0;
+                this.actualBufferLen = 0;
+            }
 
+            var eof = this.FillBuffer();
 
-		internal sealed class Field {
-			internal int Start;
-			internal int End;
-			internal int Length {
-				get { return End - Start +1; }
-			}
-			internal bool Quoted;
-			internal int EscapedQuotesCount;
-			string cachedValue = null;
+            this.fieldsCount = 0;
+            if (this.actualBufferLen <= 0) {
+                return false; // no more data
+            }
 
-			internal Field() {
-			}
+            this.linesRead++;
 
-			internal Field Reset(int start) {
-				Start = start;
-				End = start-1;
-				Quoted = false;
-				EscapedQuotesCount = 0;
-				cachedValue = null;
-				return this;
-			}
-			
-			internal string GetValue(char[] buf) {
-				if (cachedValue==null) {
-					cachedValue = GetValueInternal(buf);
-				}
-				return cachedValue;
-			}
+            var maxPos = this.lineStartPos + this.actualBufferLen;
+            var charPos = this.lineStartPos;
 
-			string GetValueInternal(char[] buf) {
-				if (Quoted) {
-					var s = Start + 1;
-					var lenWithoutQuotes = Length - 2;
-					var val = lenWithoutQuotes > 0 ? GetString(buf, s, lenWithoutQuotes) : String.Empty;
-					if (EscapedQuotesCount>0)
-						val = val.Replace("\"\"", "\"");
-					return val;
-				}
-				var len = Length;
-				return len>0 ? GetString(buf, Start, len) : String.Empty;
-			}
+            var currentField = this.GetOrAddField(charPos);
+            var ignoreQuote = false;
+            var delimFirstChar = this.Delimiter[0];
+            var trimFields = this.TrimFields;
 
-			private string GetString(char[] buf, int start, int len) {
-				var bufLen = buf.Length;
-				start = start<bufLen ? start : start % bufLen;
-				var endIdx = start + len -1;
-				if (endIdx>= bufLen) {
-					var prefixLen = buf.Length - start;
-					var prefix = new string(buf, start, prefixLen);
-					var suffix = new string(buf, 0, len - prefixLen);
-					return prefix + suffix;
-				}
-				return new string(buf, start, len);
-			}
+            int charBufIdx;
+            char ch;
+            for (; charPos < maxPos; charPos++) {
+                charBufIdx = charPos < this.bufferLength ? charPos : charPos % this.bufferLength;
+                ch = this.buffer[charBufIdx];
+                switch (ch) {
+                    case '\"':
+                        if (ignoreQuote) {
+                            currentField.End = charPos;
+                        } else if (currentField.Quoted || currentField.Length > 0) {
+                            // current field already is quoted = lets treat quotes as usual chars
+                            currentField.End = charPos;
+                            currentField.Quoted = false;
+                            ignoreQuote = true;
+                        } else {
+                            var endQuotePos = this.ReadQuotedFieldToEnd(charPos + 1, maxPos, eof, ref currentField.EscapedQuotesCount);
+                            currentField.Start = charPos;
+                            currentField.End = endQuotePos;
+                            currentField.Quoted = true;
+                            charPos = endQuotePos;
+                        }
 
-		}
+                        break;
 
-	}
+                    case '\r':
+                        if (charPos + 1 < maxPos && this.buffer[(charPos + 1) % this.bufferLength] == '\n') {
+                            // \r\n handling
+                            charPos++;
+                        }
 
+                        // in some files only \r used as line separator - lets allow that
+                        charPos++;
+                        goto LineEnded;
+
+                    case '\n':
+                        charPos++;
+                        goto LineEnded;
+
+                    default:
+                        if (ch == delimFirstChar && (this.delimLength == 1 || this.ReadDelimTail(charPos, maxPos, ref charPos))) {
+                            currentField = this.GetOrAddField(charPos + 1);
+                            ignoreQuote = false;
+                            continue;
+                        }
+
+                        // space
+                        if (ch == ' ' && trimFields) {
+                            continue; // do nothing
+                        }
+
+                        // content char
+                        if (currentField.Length == 0) {
+                            currentField.Start = charPos;
+                        }
+
+                        if (currentField.Quoted) {
+                            // non-space content after quote = treat quotes as part of content
+                            currentField.Quoted = false;
+                            ignoreQuote = true;
+                        }
+
+                        currentField.End = charPos;
+                        break;
+                }
+
+            }
+
+            if (!eof) {
+                // line is not finished, but whole buffer was processed and not EOF
+                throw new InvalidDataException(this.GetLineTooLongMsg());
+            }
+
+            LineEnded:
+            this.actualBufferLen -= charPos - this.lineStartPos;
+            this.lineStartPos = charPos % this.bufferLength;
+
+            if (this.fieldsCount == 1 && this.fields[0].Length == 0) {
+                // skip empty lines
+                return this.Read();
+            }
+
+            return true;
+        }
+
+        internal sealed class Field {
+
+            internal int Start;
+            internal int End;
+
+            internal int Length {
+                get {
+                    return this.End - this.Start + 1;
+                }
+            }
+
+            internal bool Quoted;
+            internal int EscapedQuotesCount;
+            private string cachedValue = null;
+
+            internal Field() { }
+
+            internal Field Reset(int start) {
+                this.Start = start;
+                this.End = start - 1;
+                this.Quoted = false;
+                this.EscapedQuotesCount = 0;
+                this.cachedValue = null;
+                return this;
+            }
+
+            internal string GetValue(char[] buf) {
+                if (this.cachedValue == null) {
+                    this.cachedValue = this.GetValueInternal(buf);
+                }
+
+                return this.cachedValue;
+            }
+
+            private string GetValueInternal(char[] buf) {
+                if (this.Quoted) {
+                    var s = this.Start + 1;
+                    var lenWithoutQuotes = this.Length - 2;
+                    var val = lenWithoutQuotes > 0 ? this.GetString(buf, s, lenWithoutQuotes) : String.Empty;
+                    if (this.EscapedQuotesCount > 0) {
+                        val = val.Replace("\"\"", "\"");
+                    }
+
+                    return val;
+                }
+
+                var len = this.Length;
+                return len > 0 ? this.GetString(buf, this.Start, len) : String.Empty;
+            }
+
+            private string GetString(char[] buf, int start, int len) {
+                var bufLen = buf.Length;
+                start = start < bufLen ? start : start % bufLen;
+                var endIdx = start + len - 1;
+                if (endIdx >= bufLen) {
+                    var prefixLen = buf.Length - start;
+                    var prefix = new string(buf, start, prefixLen);
+                    var suffix = new string(buf, 0, len - prefixLen);
+                    return prefix + suffix;
+                }
+
+                return new string(buf, start, len);
+            }
+
+        }
+
+    }
 
 }

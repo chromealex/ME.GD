@@ -1,0 +1,17 @@
+{
+    "name": "ME.GD.Editor",
+    "references": [
+        "GUID:07bfe8ad46a7a4bf0b3630afe1340b12"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
