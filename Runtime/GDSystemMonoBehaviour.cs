@@ -25,6 +25,13 @@ namespace ME.GD {
         
         public System.Collections.IEnumerator UpdateData(GDSystem gdSystem) {
 
+            if (this.data == null) {
+                
+                UnityEngine.Debug.LogWarning("[ME.GD] Data output is null. Please check `data` link on GD GameObject.");
+                yield break;
+                
+            }
+            
             var url = this.url.Replace("{streaming_assets}", UnityEngine.Application.streamingAssetsPath);
             yield return gdSystem.DownloadAndUpdate(url, this.version, this.data, (result) => {
 
