@@ -23,6 +23,13 @@
         }
         
         public static GDData GetMainData() {
+
+            var mono = UnityEngine.Object.FindObjectOfType<GDSystemMonoBehaviour>();
+            if (mono != null) {
+
+                return mono.data;
+
+            }
             
             var assets = UnityEditor.AssetDatabase.FindAssets("t:GDData");
             if (assets.Length > 0) {

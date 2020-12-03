@@ -197,6 +197,13 @@ namespace ME.GD {
 
             }
 
+            if (this.Get(key, out float val, forced) == true) {
+
+                value = (int)val;
+                return true;
+
+            }
+
             return false;
 
         }

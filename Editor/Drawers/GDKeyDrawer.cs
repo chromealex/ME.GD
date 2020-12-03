@@ -125,7 +125,7 @@ namespace ME.GD.Editor {
 
                         isSupported = true;
 
-                    } else if (item.type == GDValueType.Float && attrType == GDValueType.Float) {
+                    } else if ((item.type == GDValueType.Float || item.type == GDValueType.Integer) && attrType == GDValueType.Float) {
 
                         isSupported = true;
 
