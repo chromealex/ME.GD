@@ -6,14 +6,22 @@ namespace ME.GD {
         public string url;
         public string version;
         public GDData data;
+        private bool isReady;
 
         public void Awake() {
 
             UnityEngine.GameObject.DontDestroyOnLoad(this.gameObject);
 
+            this.isReady = false;
             this.Init();
             this.StartCoroutine(this.UpdateData(GDSystem.active));
             
+        }
+
+        public bool IsReady() {
+
+            return this.isReady;
+
         }
 
         public void Init() {
@@ -38,6 +46,7 @@ namespace ME.GD {
                 if (result == true) {
                     
                     gdSystem.Use(this.data);
+                    this.isReady = true;
                     
                 } else {
                     
