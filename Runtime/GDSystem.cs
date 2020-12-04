@@ -34,35 +34,41 @@ namespace ME.GD {
         public T runtimeValue;
         public bool runtimeValueSet;
 
-        public T Get() {
+        public static TEnum Get<TEnum>(GDEnum<TEnum> gdEnum) where TEnum : struct, System.IConvertible {
+            
+            if (gdEnum.runtimeValueSet == true) return gdEnum.runtimeValue;
 
-            if (this.runtimeValueSet == true) return this.runtimeValue;
-
-            var gdKey = new GDKey() { key = this.key };
+            var gdKey = new GDKey() { key = gdEnum.key };
             if (GDSystem.active.Get(gdKey, out string val) == true) {
 
                 ulong valOut = default;
                 var split = val.Split('|');
                 for (int i = 0; i < split.Length; ++i) {
 
-                    var r = (T)System.Enum.Parse(typeof(T), split[i]);
-                    var rVal = System.Runtime.CompilerServices.Unsafe.As<T, ulong>(ref r);
+                    var r = (TEnum)System.Enum.Parse(typeof(TEnum), split[i]);
+                    var rVal = System.Runtime.CompilerServices.Unsafe.As<TEnum, ulong>(ref r);
                     valOut |= rVal;
 
                 }
                 
-                var res = (T)(object)valOut;
-                this.Set(res);
+                var res = (TEnum)(object)valOut;
+                gdEnum.Set(res);
                 return res;
 
             }
 
             if (GDSystem.active.Get(gdKey, out int valInt) == true) {
-                var res = System.Runtime.CompilerServices.Unsafe.As<int, T>(ref valInt);
-                this.Set(res);
+                var res = System.Runtime.CompilerServices.Unsafe.As<int, TEnum>(ref valInt);
+                gdEnum.Set(res);
                 return res;
             }
             return default;
+
+        }
+        
+        public T Get() {
+
+            return GDEnum<T>.Get(this);
 
         }
         
