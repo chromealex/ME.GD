@@ -10,6 +10,7 @@ namespace ME.GD {
         String,
         Float,
         Integer,
+        Enum,
 
     }
 
@@ -24,18 +25,88 @@ namespace ME.GD {
 
     }
 
+    public interface IGDEnum {}
+    
     [System.Serializable]
-    public struct GDInt {
+    public struct GDEnum<T> : IGDEnum where T : struct, System.IConvertible {
 
         public string key;
+        public T runtimeValue;
+        public bool runtimeValueSet;
 
-        public int Get() {
+        public T Get() {
 
-            if (GDSystem.active.Get(this, out int val) == true) return val;
+            if (this.runtimeValueSet == true) return this.runtimeValue;
+
+            var gdKey = new GDKey() { key = this.key };
+            if (GDSystem.active.Get(gdKey, out string val) == true) {
+
+                ulong valOut = default;
+                var split = val.Split('|');
+                for (int i = 0; i < split.Length; ++i) {
+
+                    var r = (T)System.Enum.Parse(typeof(T), split[i]);
+                    var rVal = System.Runtime.CompilerServices.Unsafe.As<T, ulong>(ref r);
+                    valOut |= rVal;
+
+                }
+                
+                var res = (T)(object)valOut;
+                this.Set(res);
+                return res;
+
+            }
+
+            if (GDSystem.active.Get(gdKey, out int valInt) == true) {
+                var res = System.Runtime.CompilerServices.Unsafe.As<int, T>(ref valInt);
+                this.Set(res);
+                return res;
+            }
             return default;
 
         }
         
+        public void Set(T value) {
+
+            this.runtimeValue = value;
+            this.runtimeValueSet = true;
+
+        }
+
+        public static implicit operator T(GDEnum<T> key) {
+
+            return key.Get();
+
+        }
+
+    }
+
+    [System.Serializable]
+    public struct GDInt {
+
+        public string key;
+        public int runtimeValue;
+        public bool runtimeValueSet;
+
+        public int Get() {
+
+            if (this.runtimeValueSet == true) return this.runtimeValue;
+
+            if (GDSystem.active.Get(this, out int val) == true) {
+                this.Set(val);
+                return val;
+            }
+            return default;
+
+        }
+        
+        public void Set(int value) {
+
+            this.runtimeValue = value;
+            this.runtimeValueSet = true;
+
+        }
+
         public static implicit operator int(GDInt key) {
 
             return key.Get();
@@ -48,14 +119,28 @@ namespace ME.GD {
     public struct GDString {
         
         public string key;
+        public string runtimeValue;
+        public bool runtimeValueSet;
 
         public string Get() {
 
-            if (GDSystem.active.Get(this, out string val) == true) return val;
+            if (this.runtimeValueSet == true) return this.runtimeValue;
+
+            if (GDSystem.active.Get(this, out string val) == true) {
+                this.Set(val);
+                return val;
+            }
             return default;
 
         }
         
+        public void Set(string value) {
+
+            this.runtimeValue = value;
+            this.runtimeValueSet = true;
+
+        }
+
         public static implicit operator string(GDString key) {
 
             return key.Get();
@@ -68,20 +153,34 @@ namespace ME.GD {
     public struct GDFloat {
         
         public string key;
+        public float runtimeValue;
+        public bool runtimeValueSet;
 
         public float Get() {
 
-            if (GDSystem.active.Get(this, out float val) == true) return val;
+            if (this.runtimeValueSet == true) return this.runtimeValue;
+            
+            if (GDSystem.active.Get(this, out float val) == true) {
+                this.Set(val);
+                return val;
+            }
             return default;
+
+        }
+
+        public void Set(float value) {
+
+            this.runtimeValue = value;
+            this.runtimeValueSet = true;
 
         }
         
         public static implicit operator float(GDFloat key) {
 
             return key.Get();
-
+            
         }
-        
+
     }
     
     [System.Serializable]

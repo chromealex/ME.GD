@@ -26,6 +26,25 @@ namespace ME.GD.Editor {
 
     }
 
+    [CustomPropertyDrawer(typeof(GDEnum<>))]
+    public class GDEnumDrawer : PropertyDrawer {
+
+        public override void OnGUI(Rect position, SerializedProperty property, GUIContent label) {
+
+            var gdKeyValue = property.FindPropertyRelative("key").stringValue;
+            var gdKey = new GDKey() { key = gdKeyValue };
+            GDKeyDrawer.DrawGUI(position, label, this.fieldInfo, GDValueType.Enum, gdKey, property.hasMultipleDifferentValues, (key) => {
+
+                property.serializedObject.Update();
+                property.FindPropertyRelative("key").stringValue = key.key;
+                property.serializedObject.ApplyModifiedProperties();
+    
+            });
+
+        }
+
+    }
+
     [CustomPropertyDrawer(typeof(GDInt))]
     public class GDIntDrawer : PropertyDrawer {
 
@@ -117,7 +136,11 @@ namespace ME.GD.Editor {
 
                     var item = mainData.items[i];
                     var isSupported = false;
-                    if (item.type == GDValueType.String && attrType == GDValueType.String) {
+                    if (attrType == GDValueType.Enum && (item.type == GDValueType.String || item.type == GDValueType.Integer)) {
+
+                        isSupported = true;
+
+                    } else if (item.type == GDValueType.String && attrType == GDValueType.String) {
 
                         isSupported = true;
 
