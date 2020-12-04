@@ -43,15 +43,18 @@ namespace ME.GD {
 
                 ulong valOut = default;
                 var split = val.Split('|');
+                //UnityEngine.Debug.Log(val + " :: " + typeof(TEnum));
                 for (int i = 0; i < split.Length; ++i) {
 
                     var r = (TEnum)System.Enum.Parse(typeof(TEnum), split[i]);
                     var rVal = System.Runtime.CompilerServices.Unsafe.As<TEnum, ulong>(ref r);
+                    //UnityEngine.Debug.Log(valOut + " :: " + rVal + " :: " + r);
                     valOut |= rVal;
 
                 }
                 
-                var res = (TEnum)(object)valOut;
+                //UnityEngine.Debug.Log(valOut);
+                var res = System.Runtime.CompilerServices.Unsafe.As<ulong, TEnum>(ref valOut);
                 gdEnum.Set(res);
                 return res;
 
