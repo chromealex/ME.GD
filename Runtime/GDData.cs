@@ -6,10 +6,13 @@ namespace ME.GD {
     public class GDData : UnityEngine.ScriptableObject {
 
         public string version;
+        public int fileVersion;
         public List<Item> items = new List<Item>();
         
         internal void Clear() {
-            
+
+            this.version = string.Empty;
+            this.fileVersion = 0;
             this.items.Clear();
             
         }

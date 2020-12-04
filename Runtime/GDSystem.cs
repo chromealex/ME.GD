@@ -372,8 +372,6 @@ namespace ME.GD {
         
         public void Update(string data, string version, GDData output) {
 
-            output.Clear();
-
             var reader = new CsvReader(new System.IO.StringReader(data), ",");
             var line = 0;
             var versionIndex = -1;
@@ -381,6 +379,24 @@ namespace ME.GD {
 
                 ++line;
                 if (line == 1) {
+
+                    var fileVersionInt = 0;
+                    var fileVersion = reader[0];
+                    if (string.IsNullOrEmpty(fileVersion) == false) {
+
+                        int.TryParse(fileVersion, out fileVersionInt);
+
+                    }
+
+                    if (fileVersionInt <= output.fileVersion) {
+
+                        UnityEngine.Debug.Log("File " + output + " is up to date already, version: " + fileVersionInt);
+                        return;
+
+                    }
+
+                    output.Clear();
+                    output.fileVersion = fileVersionInt;
                     
                     // check version
                     for (int i = 1; i < reader.FieldsCount; ++i) {
