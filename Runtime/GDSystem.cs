@@ -290,7 +290,7 @@ namespace ME.GD {
                 
             }
             
-            if (this.lines.TryGetValue(key.key, out var item) == true && (item.type == GDValueType.Float || forced == true)) {
+            if (this.lines.TryGetValue(key.key, out var item) == true && ((item.type == GDValueType.Float || item.type == GDValueType.Integer) || forced == true)) {
 
                 value = item.f;
                 return true;
