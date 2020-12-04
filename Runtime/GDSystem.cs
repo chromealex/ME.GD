@@ -284,6 +284,12 @@ namespace ME.GD {
         public bool Get(GDKey key, out float value, bool forced = false) {
 
             value = default;
+            if (string.IsNullOrEmpty(key.key) == true) {
+
+                return false;
+                
+            }
+            
             if (this.lines.TryGetValue(key.key, out var item) == true && (item.type == GDValueType.Float || forced == true)) {
 
                 value = item.f;
@@ -298,6 +304,12 @@ namespace ME.GD {
         public bool Get(GDKey key, out int value, bool forced = false) {
             
             value = default;
+            if (string.IsNullOrEmpty(key.key) == true) {
+
+                return false;
+                
+            }
+            
             if (this.lines.TryGetValue(key.key, out var item) == true && (item.type == GDValueType.Integer || forced == true)) {
 
                 value = item.i;
@@ -317,8 +329,14 @@ namespace ME.GD {
         }
 
         public bool Get(GDKey key, out string value, bool forced = false) {
-            
+
             value = default;
+            if (string.IsNullOrEmpty(key.key) == true) {
+
+                return false;
+                
+            }
+            
             if (this.lines.TryGetValue(key.key, out var item) == true && (item.type == GDValueType.String || forced == true)) {
 
                 value = item.s;
