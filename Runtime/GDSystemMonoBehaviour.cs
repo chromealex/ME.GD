@@ -7,6 +7,7 @@ namespace ME.GD {
         public string version;
         public GDData data;
         private bool isReady;
+        private bool isLoading;
         public bool showLogs;
 
         public void Awake() {
@@ -25,9 +26,17 @@ namespace ME.GD {
 
         }
 
+        public bool IsLoading() {
+
+            return this.isLoading;
+
+        }
+
         public void Init() {
             
-            var gdSystem = new GDSystem();
+            var gdSystem = new GDSystem() {
+                showLogs = this.showLogs
+            };
             GDSystem.SetActive(gdSystem);
 
         }
@@ -41,6 +50,7 @@ namespace ME.GD {
                 
             }
 
+            this.isLoading = true;
             if (gdSystem.ApplyCache(this.version, this.data) == true) {
                 
                 if (this.showLogs == true) UnityEngine.Debug.Log("[ME.GD] Cache read successfully");
@@ -61,6 +71,8 @@ namespace ME.GD {
                     if (this.showLogs == true) UnityEngine.Debug.LogError("Failed to load " + this.url + ", version: " + this.version);
                     
                 }
+                
+                this.isLoading = false;
                 
             });
 

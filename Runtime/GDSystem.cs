@@ -389,7 +389,7 @@ namespace ME.GD {
 
                     }
 
-                    if (fileVersionInt <= output.fileVersion) {
+                    if (fileVersionInt <= output.fileVersion && version == output.version) {
 
                         if (this.showLogs == true) UnityEngine.Debug.Log("File " + output + " is up to date already, version: " + fileVersionInt);
                         return;
@@ -438,6 +438,32 @@ namespace ME.GD {
 
             if (this.showLogs == true) UnityEngine.Debug.Log("[ME.GD] Done");
 
+        }
+
+        public bool HasCache(out int bytesCount) {
+
+            bytesCount = 0;
+            var cachePath = this.GetCachePath();
+            if (System.IO.File.Exists(cachePath) == true) {
+
+                bytesCount = System.IO.File.ReadAllBytes(cachePath).Length;
+                return true;
+                
+            }
+
+            return false;
+
+        }
+
+        public void ClearCache() {
+
+            if (this.HasCache(out _) == true) {
+                
+                var cachePath = this.GetCachePath();
+                System.IO.File.Delete(cachePath);
+                
+            }
+            
         }
 
         public bool ApplyCache(string version, GDData data) {
