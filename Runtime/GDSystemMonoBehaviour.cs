@@ -7,6 +7,7 @@ namespace ME.GD {
         public string version;
         public GDData data;
         private bool isReady;
+        public bool showLogs;
 
         public void Awake() {
 
@@ -35,9 +36,16 @@ namespace ME.GD {
 
             if (this.data == null) {
                 
-                UnityEngine.Debug.LogWarning("[ME.GD] Data output is null. Please check `data` link on GD GameObject.");
+                if (this.showLogs == true) UnityEngine.Debug.LogWarning("[ME.GD] Data output is null. Please check `data` link on GD GameObject.");
                 yield break;
                 
+            }
+
+            if (gdSystem.ApplyCache(this.version, this.data) == true) {
+                
+                if (this.showLogs == true) UnityEngine.Debug.Log("[ME.GD] Cache read successfully");
+                this.isReady = true;
+
             }
             
             var url = this.url.Replace("{streaming_assets}", UnityEngine.Application.streamingAssetsPath);
@@ -50,7 +58,7 @@ namespace ME.GD {
                     
                 } else {
                     
-                    UnityEngine.Debug.LogError("Failed to load " + this.url + ", version: " + this.version);
+                    if (this.showLogs == true) UnityEngine.Debug.LogError("Failed to load " + this.url + ", version: " + this.version);
                     
                 }
                 

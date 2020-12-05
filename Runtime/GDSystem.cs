@@ -251,6 +251,7 @@ namespace ME.GD {
         public static GDSystem active;
         private Dictionary<string, Item> lines = new Dictionary<string, Item>();
         private GDData data;
+        public bool showLogs;
 
         public static void SetActive(GDSystem system) {
 
@@ -371,7 +372,7 @@ namespace ME.GD {
         }
         
         public void Update(string data, string version, GDData output) {
-
+            
             var reader = new CsvReader(new System.IO.StringReader(data), ",");
             var line = 0;
             var versionIndex = -1;
@@ -390,7 +391,7 @@ namespace ME.GD {
 
                     if (fileVersionInt <= output.fileVersion) {
 
-                        UnityEngine.Debug.Log("File " + output + " is up to date already, version: " + fileVersionInt);
+                        if (this.showLogs == true) UnityEngine.Debug.Log("File " + output + " is up to date already, version: " + fileVersionInt);
                         return;
 
                     }
@@ -435,6 +436,29 @@ namespace ME.GD {
             output.version = version;
             output.SetDirty();
 
+            if (this.showLogs == true) UnityEngine.Debug.Log("[ME.GD] Done");
+
+        }
+
+        public bool ApplyCache(string version, GDData data) {
+            
+            var cachePath = this.GetCachePath();
+            if (System.IO.File.Exists(cachePath) == true) {
+
+                var fileData = System.IO.File.ReadAllText(cachePath);
+                this.Update(fileData, version, data);
+                return true;
+                
+            }
+
+            return false;
+
+        }
+        
+        private string GetCachePath() {
+            
+            return $"{UnityEngine.Application.persistentDataPath}/ME.GD/DataCache.mec";
+            
         }
         
         public System.Collections.IEnumerator DownloadAndUpdate(string url, string version, GDData data, System.Action<bool> onComplete) {
@@ -444,7 +468,18 @@ namespace ME.GD {
             while (request.isDone == false) yield return null;
 
             var hasError = (request.isNetworkError == true || request.isHttpError == true);
-            if (hasError == false) this.Update(request.downloadHandler.text, version, data);
+            if (hasError == false) {
+
+                { // Write cache
+                    var cachePath = this.GetCachePath();
+                    var dir = System.IO.Path.GetDirectoryName(cachePath);
+                    if (string.IsNullOrEmpty(dir) == false && System.IO.Directory.Exists(dir) == false) System.IO.Directory.CreateDirectory(dir);
+                    System.IO.File.WriteAllText(cachePath, request.downloadHandler.text);
+                }
+                
+                this.Update(request.downloadHandler.text, version, data);
+                
+            }
             onComplete.Invoke(hasError == false);
 
         }

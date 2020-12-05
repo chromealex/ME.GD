@@ -22,7 +22,7 @@ namespace ME.GD.Parsers {
     /// Fast and memory efficient implementation of CSV reader (3x times faster than CsvHelper).
     /// </summary>
     /// <remarks>API is similar to CSVHelper CsvReader.</remarks>
-    public class CsvReader {
+    public struct CsvReader {
 
         public string Delimiter { get; private set; }
         private int delimLength;
@@ -31,18 +31,21 @@ namespace ME.GD.Parsers {
         /// Size of the circular buffer. Buffer size limits max length of the CSV line that can be processed. 
         /// </summary>
         /// <remarks>Default buffer size is 32kb.</remarks>
-        public int BufferSize { get; set; } = 32768;
+        public int BufferSize { get; set; }
 
         /// <summary>
         /// If true start/end spaces are excluded from field values (except values in quotes). True by default.
         /// </summary>
-        public bool TrimFields { get; set; } = true;
+        public bool TrimFields { get; set; }
 
         private TextReader rdr;
 
         public CsvReader(TextReader rdr) : this(rdr, ",") { }
 
         public CsvReader(TextReader rdr, string delimiter) {
+            
+            this.BufferSize = 32768;
+            this.TrimFields = true;
             this.rdr = rdr;
             this.Delimiter = delimiter;
             this.delimLength = delimiter.Length;
@@ -50,16 +53,26 @@ namespace ME.GD.Parsers {
             if (this.delimLength == 0) {
                 throw new ArgumentException("Delimiter cannot be empty.");
             }
+
+            this.buffer = null;
+            this.bufferLength = 0;
+            this.bufferLoadThreshold = 0;
+            this.lineStartPos = 0;
+            this.actualBufferLen = 0;
+            this.fields = null;
+            this.fieldsCount = 0;
+            this.linesRead = 0;
+            
         }
 
-        private char[] buffer = null;
+        private char[] buffer;
         private int bufferLength;
         private int bufferLoadThreshold;
-        private int lineStartPos = 0;
-        private int actualBufferLen = 0;
-        private List<Field> fields = null;
-        private int fieldsCount = 0;
-        private int linesRead = 0;
+        private int lineStartPos;
+        private int actualBufferLen;
+        private List<Field> fields;
+        private int fieldsCount;
+        private int linesRead;
 
         private int ReadBlockAndCheckEof(char[] buffer, int start, int len, ref bool eof) {
             if (len == 0) {
