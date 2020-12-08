@@ -116,7 +116,7 @@ namespace ME.GD {
         public void Set(int value) {
 
             this.runtimeValue = value;
-            if (value != 0) this.runtimeValueSet = true;
+            this.runtimeValueSet = true;
 
         }
 
@@ -158,7 +158,7 @@ namespace ME.GD {
         public void Set(string value) {
 
             this.runtimeValue = value;
-            if (value != string.Empty) this.runtimeValueSet = true;
+            this.runtimeValueSet = true;
 
         }
 
@@ -194,7 +194,7 @@ namespace ME.GD {
         public void Set(float value) {
 
             this.runtimeValue = value;
-            if (value != 0f) this.runtimeValueSet = true;
+            this.runtimeValueSet = true;
 
         }
         
