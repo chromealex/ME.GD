@@ -61,12 +61,10 @@ namespace ME.GD {
             var url = this.url.Replace("{streaming_assets}", UnityEngine.Application.streamingAssetsPath);
             yield return gdSystem.DownloadAndUpdate(url, this.version, this.data, (result) => {
 
-                if (result == true) {
-                    
-                    gdSystem.Use(this.data);
-                    this.isReady = true;
-                    
-                } else {
+                gdSystem.Use(this.data);
+                this.isReady = true;
+
+                if (result == false) {
                     
                     if (this.showLogs == true) UnityEngine.Debug.LogError("Failed to load " + this.url + ", version: " + this.version);
                     
