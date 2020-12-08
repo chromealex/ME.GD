@@ -116,7 +116,13 @@ namespace ME.GD {
         public void Set(int value) {
 
             this.runtimeValue = value;
-            this.runtimeValueSet = true;
+            if (value != 0) this.runtimeValueSet = true;
+
+        }
+
+        public static implicit operator float(GDInt key) {
+
+            return key.Get();
 
         }
 
@@ -152,7 +158,7 @@ namespace ME.GD {
         public void Set(string value) {
 
             this.runtimeValue = value;
-            this.runtimeValueSet = true;
+            if (value != string.Empty) this.runtimeValueSet = true;
 
         }
 
@@ -188,7 +194,7 @@ namespace ME.GD {
         public void Set(float value) {
 
             this.runtimeValue = value;
-            this.runtimeValueSet = true;
+            if (value != 0f) this.runtimeValueSet = true;
 
         }
         
