@@ -427,13 +427,14 @@ namespace ME.GD {
                 var key = reader[0];
                 var value = reader[versionIndex];
 
+                var style = System.Globalization.NumberStyles.Number;
                 var item = new Item() {
                     key = key,
                     type = GDValueType.String,
                     s = value,
                 };
-                if (float.TryParse(value, out item.f) == true) item.type = GDValueType.Float;
-                if (int.TryParse(value, out item.i) == true) item.type = GDValueType.Integer;
+                if (float.TryParse(value, style, System.Globalization.CultureInfo.InvariantCulture, out item.f) == true) item.type = GDValueType.Float;
+                if (int.TryParse(value, style, System.Globalization.CultureInfo.InvariantCulture, out item.i) == true) item.type = GDValueType.Integer;
 
                 output.Add(item);
 
