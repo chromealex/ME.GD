@@ -187,7 +187,6 @@ namespace ME.GD {
 
         public void Set(float value) {
 
-            if (value == 0f) UnityEngine.Debug.LogWarning("Set is zero");
             this.runtimeValue = value;
             this.runtimeValueSet = true;
 
