@@ -51,9 +51,11 @@ namespace ME.GD {
             }
 
             this.isLoading = true;
+            
             if (gdSystem.ApplyCache(this.version, this.data) == true) {
                 
                 if (this.showLogs == true) UnityEngine.Debug.Log("[ME.GD] Cache read successfully");
+                gdSystem.Use(this.data);
                 this.isReady = true;
 
             }
