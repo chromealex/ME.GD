@@ -18,6 +18,12 @@
             var sys = new GDSystem();
             sys.Use(data);
             sys.Get(key, out string val, forced: true);
+            if (string.IsNullOrEmpty(key.runtimeValue) == false) {
+
+                return key.runtimeValue + " (" + key.key + " = " + val + ")";
+
+            }
+            
             return key.key + " = " + val;
 
         }

@@ -12,7 +12,8 @@ namespace ME.GD.Editor {
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label) {
 
             var gdKeyValue = property.FindPropertyRelative("key").stringValue;
-            var gdKey = new GDKey() { key = gdKeyValue };
+            var gdKeyValueRuntime = property.FindPropertyRelative("runtimeValue").floatValue;
+            var gdKey = new GDKey() { key = gdKeyValue, runtimeValue = gdKeyValueRuntime.ToString() };
             GDKeyDrawer.DrawGUI(position, label, this.fieldInfo, GDValueType.Float, gdKey, property.hasMultipleDifferentValues, (key) => {
 
                 property.serializedObject.Update();
@@ -31,7 +32,8 @@ namespace ME.GD.Editor {
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label) {
 
             var gdKeyValue = property.FindPropertyRelative("key").stringValue;
-            var gdKey = new GDKey() { key = gdKeyValue };
+            var gdKeyValueRuntime = property.FindPropertyRelative("runtimeValue").enumValueIndex;
+            var gdKey = new GDKey() { key = gdKeyValue, runtimeValue = gdKeyValueRuntime.ToString() };
             GDKeyDrawer.DrawGUI(position, label, this.fieldInfo, GDValueType.Enum, gdKey, property.hasMultipleDifferentValues, (key) => {
 
                 property.serializedObject.Update();
@@ -50,7 +52,8 @@ namespace ME.GD.Editor {
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label) {
 
             var gdKeyValue = property.FindPropertyRelative("key").stringValue;
-            var gdKey = new GDKey() { key = gdKeyValue };
+            var gdKeyValueRuntime = property.FindPropertyRelative("runtimeValue").intValue;
+            var gdKey = new GDKey() { key = gdKeyValue, runtimeValue = gdKeyValueRuntime.ToString() };
             GDKeyDrawer.DrawGUI(position, label, this.fieldInfo, GDValueType.Integer, gdKey, property.hasMultipleDifferentValues, (key) => {
 
                 property.serializedObject.Update();
@@ -69,7 +72,8 @@ namespace ME.GD.Editor {
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label) {
 
             var gdKeyValue = property.FindPropertyRelative("key").stringValue;
-            var gdKey = new GDKey() { key = gdKeyValue };
+            var gdKeyValueRuntime = property.FindPropertyRelative("runtimeValue").stringValue;
+            var gdKey = new GDKey() { key = gdKeyValue, runtimeValue = gdKeyValueRuntime };
             GDKeyDrawer.DrawGUI(position, label, this.fieldInfo, GDValueType.String, gdKey, property.hasMultipleDifferentValues, (key) => {
 
                 property.serializedObject.Update();
@@ -88,7 +92,8 @@ namespace ME.GD.Editor {
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label) {
 
             var gdKeyValue = property.FindPropertyRelative("key").stringValue;
-            var gdKey = new GDKey() { key = gdKeyValue };
+            var gdKeyValueRuntime = property.FindPropertyRelative("runtimeValue").stringValue;
+            var gdKey = new GDKey() { key = gdKeyValue, runtimeValue = gdKeyValueRuntime };
             gdKey = GDKeyDrawer.DrawGUI(position, label, this.fieldInfo, gdKey, property.hasMultipleDifferentValues, (key) => {
 
                 property.serializedObject.Update();
@@ -114,11 +119,10 @@ namespace ME.GD.Editor {
             var mainData = GDSystem.active.GetData();
             var attrType = valueType;
 
-            var key = value.key;//property.FindPropertyRelative("key").stringValue;
             var labelField = new Rect(position.x, position.y, EditorGUIUtility.labelWidth, position.height);
             var contentField = new Rect(position.x + EditorGUIUtility.labelWidth, position.y, position.width - EditorGUIUtility.labelWidth, position.height);
             EditorGUI.LabelField(labelField, label);
-            if (GUI.Button(contentField, new GUIContent(hasMultipleDifferentValues == true ? "-" : GDSystemEditor.GetKeyCaption(new GDKey() { key = key }, mainData)), EditorStyles.textField) == true) {
+            if (GUI.Button(contentField, new GUIContent(hasMultipleDifferentValues == true ? "-" : GDSystemEditor.GetKeyCaption(value, mainData)), EditorStyles.textField) == true) {
 
                 var rect = contentField;
                 var vector = GUIUtility.GUIToScreenPoint(new Vector2(rect.x, rect.y));
