@@ -31,6 +31,7 @@ namespace ME.GD {
     public struct GDEnum<T> : IGDEnum where T : struct, System.IConvertible {
 
         public string key;
+        [System.NonSerialized]
         public T runtimeValue;
         [System.NonSerialized]
         public bool runtimeValueSet;
@@ -103,6 +104,7 @@ namespace ME.GD {
     public struct GDInt {
 
         public string key;
+        [System.NonSerialized]
         public int runtimeValue;
         [System.NonSerialized]
         public bool runtimeValueSet;
@@ -152,6 +154,7 @@ namespace ME.GD {
     public struct GDString {
         
         public string key;
+        [System.NonSerialized]
         public string runtimeValue;
         [System.NonSerialized]
         public bool runtimeValueSet;
@@ -195,6 +198,7 @@ namespace ME.GD {
     public struct GDFloat {
         
         public string key;
+        [System.NonSerialized]
         public float runtimeValue;
         [System.NonSerialized]
         public bool runtimeValueSet;
@@ -238,6 +242,7 @@ namespace ME.GD {
     public struct GDKey {
 
         public string key;
+        [System.NonSerialized]
         public string runtimeValue;
 
         public float GetFloat() {
