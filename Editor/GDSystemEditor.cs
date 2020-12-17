@@ -20,7 +20,7 @@
             sys.Get(key, out string val, forced: true);
             if (string.IsNullOrEmpty(key.runtimeValue) == false) {
 
-                return key.runtimeValue + " (" + key.key + " = " + val + ")";
+                return $"<color=#008000ff><b>{key.runtimeValue}</b></color> ({key.key} = {val})";
 
             }
             

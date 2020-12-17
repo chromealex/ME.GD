@@ -122,7 +122,9 @@ namespace ME.GD.Editor {
             var labelField = new Rect(position.x, position.y, EditorGUIUtility.labelWidth, position.height);
             var contentField = new Rect(position.x + EditorGUIUtility.labelWidth, position.y, position.width - EditorGUIUtility.labelWidth, position.height);
             EditorGUI.LabelField(labelField, label);
-            if (GUI.Button(contentField, new GUIContent(hasMultipleDifferentValues == true ? "-" : GDSystemEditor.GetKeyCaption(value, mainData)), EditorStyles.textField) == true) {
+            var style = new GUIStyle(EditorStyles.textField);
+            style.richText = true;
+            if (GUI.Button(contentField, new GUIContent(hasMultipleDifferentValues == true ? "-" : GDSystemEditor.GetKeyCaption(value, mainData)), style) == true) {
 
                 var rect = contentField;
                 var vector = GUIUtility.GUIToScreenPoint(new Vector2(rect.x, rect.y));

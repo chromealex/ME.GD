@@ -70,6 +70,14 @@ namespace ME.GD {
 
         }
         
+        public string GetRuntimeValueStr() {
+
+            if (this.runtimeValueSet == true) return this.runtimeValue.ToString();
+            
+            return null;
+
+        }
+
         public T Get() {
 
             return GDEnum<T>.Get(this);
@@ -111,6 +119,14 @@ namespace ME.GD {
 
         }
         
+        public string GetRuntimeValueStr() {
+
+            if (this.runtimeValueSet == true) return this.runtimeValue.ToString();
+            
+            return null;
+
+        }
+
         public void Set(int value) {
 
             this.runtimeValue = value;
@@ -152,6 +168,14 @@ namespace ME.GD {
 
         }
         
+        public string GetRuntimeValueStr() {
+
+            if (this.runtimeValueSet == true) return this.runtimeValue.ToString();
+            
+            return null;
+
+        }
+
         public void Set(string value) {
 
             this.runtimeValue = value;
@@ -184,6 +208,14 @@ namespace ME.GD {
                 return val;
             }
             return default;
+
+        }
+
+        public string GetRuntimeValueStr() {
+
+            if (this.runtimeValueSet == true) return this.runtimeValue.ToString();
+            
+            return null;
 
         }
 
