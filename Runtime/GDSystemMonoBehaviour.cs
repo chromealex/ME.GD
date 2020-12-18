@@ -50,21 +50,37 @@ namespace ME.GD {
                 
             }
 
-            this.isLoading = true;
-            
             if (gdSystem.ApplyCache(this.version, this.data) == true) {
                 
                 if (this.showLogs == true) UnityEngine.Debug.Log("[ME.GD] Cache read successfully");
-                gdSystem.Use(this.data);
-                this.isReady = true;
+                try {
 
+                    gdSystem.Use(this.data);
+                    this.isReady = true;
+
+                } catch (System.Exception ex) {
+                    
+                    UnityEngine.Debug.LogException(ex);
+                    
+                }
+                
             }
             
+            this.isLoading = true;
+
             var url = this.url.Replace("{streaming_assets}", UnityEngine.Application.streamingAssetsPath);
             yield return gdSystem.DownloadAndUpdate(url, this.version, this.data, (result) => {
 
-                gdSystem.Use(this.data);
-                this.isReady = true;
+                try {
+
+                    gdSystem.Use(this.data);
+                    this.isReady = true;
+
+                } catch (System.Exception ex) {
+                    
+                    UnityEngine.Debug.LogException(ex);
+                    
+                }
 
                 if (result == false) {
                     

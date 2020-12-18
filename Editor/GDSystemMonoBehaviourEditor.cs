@@ -107,7 +107,7 @@ namespace ME.GD.Editor {
 
                 UnityEngine.GUILayout.BeginHorizontal(UnityEditor.EditorStyles.helpBox);
                 {
-                    UnityEngine.GUILayout.Label("Cache: " + GDSystem.active.HasCache(out var bytes) + " (" + bytes + "b)");
+                    UnityEngine.GUILayout.Label("Cache: " + GDSystem.active.HasCache(out var bytes) + " (" + MathUtils.BytesCountToString(bytes) + ")");
                     UnityEngine.GUILayout.FlexibleSpace();
                     if (UnityEngine.GUILayout.Button("Clear", UnityEngine.GUILayout.Width(60f)) == true) {
 

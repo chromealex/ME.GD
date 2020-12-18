@@ -477,7 +477,7 @@ namespace ME.GD {
             output.version = version;
             output.SetDirty();
 
-            if (this.showLogs == true) UnityEngine.Debug.Log("[ME.GD] Done");
+            if (this.showLogs == true) UnityEngine.Debug.Log("[ME.GD] Updated version: " + output.fileVersion + ". Done");
 
         }
 
