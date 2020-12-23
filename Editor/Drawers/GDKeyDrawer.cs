@@ -12,7 +12,7 @@ namespace ME.GD.Editor {
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label) {
 
             var gdKeyValue = property.FindPropertyRelative("key").stringValue;
-            var gdKeyValueRuntime = property.FindPropertyRelative("runtimeValue").floatValue;
+            var gdKeyValueRuntime = property.FindPropertyRelative("runtimeValue")?.floatValue;
             var gdKey = new GDKey() { key = gdKeyValue, runtimeValue = gdKeyValueRuntime.ToString() };
             GDKeyDrawer.DrawGUI(position, label, this.fieldInfo, GDValueType.Float, gdKey, property.hasMultipleDifferentValues, (key) => {
 
@@ -32,7 +32,7 @@ namespace ME.GD.Editor {
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label) {
 
             var gdKeyValue = property.FindPropertyRelative("key").stringValue;
-            var gdKeyValueRuntime = property.FindPropertyRelative("runtimeValue").enumValueIndex;
+            var gdKeyValueRuntime = property.FindPropertyRelative("runtimeValue")?.enumValueIndex;
             var gdKey = new GDKey() { key = gdKeyValue, runtimeValue = gdKeyValueRuntime.ToString() };
             GDKeyDrawer.DrawGUI(position, label, this.fieldInfo, GDValueType.Enum, gdKey, property.hasMultipleDifferentValues, (key) => {
 
@@ -52,7 +52,7 @@ namespace ME.GD.Editor {
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label) {
 
             var gdKeyValue = property.FindPropertyRelative("key").stringValue;
-            var gdKeyValueRuntime = property.FindPropertyRelative("runtimeValue").intValue;
+            var gdKeyValueRuntime = property.FindPropertyRelative("runtimeValue")?.intValue;
             var gdKey = new GDKey() { key = gdKeyValue, runtimeValue = gdKeyValueRuntime.ToString() };
             GDKeyDrawer.DrawGUI(position, label, this.fieldInfo, GDValueType.Integer, gdKey, property.hasMultipleDifferentValues, (key) => {
 
@@ -72,7 +72,7 @@ namespace ME.GD.Editor {
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label) {
 
             var gdKeyValue = property.FindPropertyRelative("key").stringValue;
-            var gdKeyValueRuntime = property.FindPropertyRelative("runtimeValue").stringValue;
+            var gdKeyValueRuntime = property.FindPropertyRelative("runtimeValue")?.stringValue;
             var gdKey = new GDKey() { key = gdKeyValue, runtimeValue = gdKeyValueRuntime };
             GDKeyDrawer.DrawGUI(position, label, this.fieldInfo, GDValueType.String, gdKey, property.hasMultipleDifferentValues, (key) => {
 
@@ -92,7 +92,7 @@ namespace ME.GD.Editor {
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label) {
 
             var gdKeyValue = property.FindPropertyRelative("key").stringValue;
-            var gdKeyValueRuntime = property.FindPropertyRelative("runtimeValue").stringValue;
+            var gdKeyValueRuntime = property.FindPropertyRelative("runtimeValue")?.stringValue;
             var gdKey = new GDKey() { key = gdKeyValue, runtimeValue = gdKeyValueRuntime };
             gdKey = GDKeyDrawer.DrawGUI(position, label, this.fieldInfo, gdKey, property.hasMultipleDifferentValues, (key) => {
 
