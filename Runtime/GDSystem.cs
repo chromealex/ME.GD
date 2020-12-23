@@ -43,6 +43,8 @@ namespace ME.GD {
             var gdKey = new GDKey() { key = gdEnum.key };
             if (GDSystem.active.Get(gdKey, out string val) == true) {
 
+                if (GDSystem.active.GetEnumCache<TEnum>(gdKey.key, out var resEnum) == true) return resEnum;
+
                 ulong valOut = default;
                 var split = val.Split('|');
                 //UnityEngine.Debug.Log(val + " :: " + typeof(TEnum));
@@ -58,6 +60,9 @@ namespace ME.GD {
                 //UnityEngine.Debug.Log(valOut);
                 var res = System.Runtime.CompilerServices.Unsafe.As<ulong, TEnum>(ref valOut);
                 gdEnum.Set(res);
+
+                GDSystem.active.SetEnumCache(gdKey.key, res);
+                
                 return res;
 
             }
@@ -293,6 +298,30 @@ namespace ME.GD {
         private GDData data;
         public bool showLogs;
 
+        public abstract class EnumCacheBase {
+
+        }
+        
+        public class EnumCache<TEnum> : EnumCacheBase {
+
+            public Dictionary<string, TEnum> values = new Dictionary<string, TEnum>();
+
+            public void Set(string key, TEnum val) {
+                
+                this.values.Add(key, val);
+                
+            }
+
+            public bool Get(string key, out TEnum val) {
+
+                return this.values.TryGetValue(key, out val);
+
+            }
+
+        }
+
+        public Dictionary<System.Type, EnumCacheBase> cache = new Dictionary<System.Type, EnumCacheBase>();
+        
         public static void SetActive(GDSystem system) {
 
             GDSystem.active = system;
@@ -303,6 +332,35 @@ namespace ME.GD {
 
             return this.data;
 
+        }
+
+        public bool GetEnumCache<T>(string key, out T val) {
+
+            val = default;
+            
+            var type = typeof(T);
+            if (this.cache.TryGetValue(type, out var cache) == true) {
+
+                return ((EnumCache<T>)cache).Get(key, out val);
+
+            }
+
+            return false;
+
+        }
+        
+        public void SetEnumCache<T>(string key, T val) {
+
+            var type = typeof(T);
+            if (this.cache.TryGetValue(type, out var cache) == false) {
+
+                cache = new EnumCache<T>();
+                this.cache.Add(type, cache);
+
+            }
+
+            ((EnumCache<T>)cache).Set(key, val);
+            
         }
 
         public int GetKeysCount() {
