@@ -241,6 +241,12 @@ namespace ME.GD {
             
         }
 
+        public static implicit operator GDFloat(float value) {
+
+            return new GDFloat() { runtimeValueSet = true, runtimeValue = value };
+            
+        }
+
     }
     
     [System.Serializable]
