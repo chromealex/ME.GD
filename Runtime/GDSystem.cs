@@ -44,6 +44,7 @@ namespace ME.GD {
             if (GDSystem.active.Get(gdKey, out string val) == true) {
 
                 if (GDSystem.active.GetEnumCache<TEnum>(gdKey.key, out var resEnum) == true) return resEnum;
+                if (string.IsNullOrEmpty(val) == true) return default;
 
                 ulong valOut = default;
                 var split = val.Split('|');
