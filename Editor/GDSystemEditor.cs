@@ -13,7 +13,17 @@
 
         public static string GetKeyCaption(GDKey key, GDData data) {
 
-            if (string.IsNullOrEmpty(key.key) == true) return "None";
+            if (string.IsNullOrEmpty(key.key) == true) {
+                
+                if (string.IsNullOrEmpty(key.runtimeValue) == false) {
+
+                    return $"<color=#008000ff><b>{key.runtimeValue}</b></color>";
+
+                }
+                
+                return "None";
+                
+            }
             
             var sys = new GDSystem();
             sys.Use(data);
