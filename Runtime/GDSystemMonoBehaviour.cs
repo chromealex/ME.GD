@@ -9,6 +9,7 @@ namespace ME.GD {
         private bool isReady;
         private bool isLoading;
         public bool showLogs;
+        public bool updateOnStart;
 
         public void Awake() {
 
@@ -16,7 +17,7 @@ namespace ME.GD {
 
             this.isReady = false;
             this.Init();
-            this.StartCoroutine(this.UpdateData(GDSystem.active));
+            if (this.updateOnStart == true) this.StartCoroutine(this.UpdateData(GDSystem.active));
             
         }
 

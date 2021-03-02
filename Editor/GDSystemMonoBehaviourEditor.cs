@@ -74,6 +74,16 @@ namespace ME.GD.Editor {
 
                 }
 
+                UnityEngine.GUILayout.Space(10f);
+
+                var updateOnStart = UnityEditor.EditorGUILayout.Toggle("Update on Start", target.updateOnStart);
+                if (updateOnStart != target.updateOnStart) {
+                    
+                    target.updateOnStart = updateOnStart;
+                    this.SetDirty();
+
+                }
+
             });
             
             UnityEngine.GUILayout.Space(10f);
