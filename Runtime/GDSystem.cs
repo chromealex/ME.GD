@@ -377,6 +377,13 @@ namespace ME.GD {
 
         }
 
+        public int GetVersion() {
+
+            if (this.data == null) return 0;
+            return this.data.fileVersion;
+
+        }
+
         public bool Get(GDInt key, out int value, bool forced = false) {
 
             return this.Get(new GDKey() { key = key.key }, out value, forced);

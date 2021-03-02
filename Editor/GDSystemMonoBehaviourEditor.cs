@@ -104,6 +104,7 @@ namespace ME.GD.Editor {
                 UnityEngine.GUILayout.BeginHorizontal(UnityEditor.EditorStyles.helpBox);
                 {
                     UnityEngine.GUILayout.Label("Loaded keys count: " + GDSystem.active.GetKeysCount());
+                    UnityEngine.GUILayout.Label("Version: " + GDSystem.active.GetVersion());
                     UnityEngine.GUILayout.FlexibleSpace();
                     if (UnityEngine.GUILayout.Button("Update", UnityEngine.GUILayout.Width(60f)) == true) {
 
