@@ -17,7 +17,16 @@ namespace ME.GD {
 
             this.isReady = false;
             this.Init();
-            if (this.updateOnStart == true) this.StartCoroutine(this.UpdateData(GDSystem.active));
+            if (this.updateOnStart == true) {
+                
+                this.StartCoroutine(this.UpdateData(GDSystem.active));
+                
+            } else {
+                
+                GDSystem.active.Use(this.data); 
+                this.isReady = true;
+                
+            }
             
         }
 
