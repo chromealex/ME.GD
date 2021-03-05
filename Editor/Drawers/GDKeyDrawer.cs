@@ -118,9 +118,10 @@ namespace ME.GD.Editor {
             
             var mainData = GDSystem.active.GetData();
             var attrType = valueType;
+            const float offsetY = 2f;
 
-            var labelField = new Rect(position.x + 2f, position.y, EditorGUIUtility.labelWidth, position.height);
-            var contentField = new Rect(position.x + EditorGUIUtility.labelWidth + 4f, position.y, position.width - EditorGUIUtility.labelWidth - 8f, position.height);
+            var labelField = new Rect(position.x + 2f, position.y + offsetY, EditorGUIUtility.labelWidth, position.height);
+            var contentField = new Rect(position.x + EditorGUIUtility.labelWidth + 4f, position.y + offsetY, position.width - EditorGUIUtility.labelWidth - 8f, position.height);
             EditorGUI.LabelField(labelField, label);
             var style = new GUIStyle(EditorStyles.textField);
             style.richText = true;
