@@ -24,9 +24,16 @@
                 return "None";
                 
             }
-            
-            var sys = new GDSystem();
-            sys.Use(data);
+
+            var sys = GDSystem.active;
+            if (sys == null) {
+
+                sys = new GDSystem();
+                sys.Use(data);
+                GDSystem.SetActive(sys);
+
+            }
+
             sys.Get(key, out string val, forced: true);
             if (string.IsNullOrEmpty(key.runtimeValue) == false) {
 
