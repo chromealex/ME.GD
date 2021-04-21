@@ -9,6 +9,12 @@ namespace ME.GD.Editor {
     [CustomPropertyDrawer(typeof(GDFloat))]
     public class GDFloatDrawer : PropertyDrawer {
 
+        public override float GetPropertyHeight(UnityEditor.SerializedProperty property, GUIContent label) {
+            
+            return 18f;
+            
+        }
+
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label) {
 
             var gdKeyValue = property.FindPropertyRelative("key").stringValue;
@@ -28,6 +34,12 @@ namespace ME.GD.Editor {
 
     [CustomPropertyDrawer(typeof(GDEnum<>))]
     public class GDEnumDrawer : PropertyDrawer {
+
+        public override float GetPropertyHeight(UnityEditor.SerializedProperty property, GUIContent label) {
+            
+            return 18f;
+            
+        }
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label) {
 
@@ -49,6 +61,12 @@ namespace ME.GD.Editor {
     [CustomPropertyDrawer(typeof(GDInt))]
     public class GDIntDrawer : PropertyDrawer {
 
+        public override float GetPropertyHeight(UnityEditor.SerializedProperty property, GUIContent label) {
+            
+            return 18f;
+            
+        }
+
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label) {
 
             var gdKeyValue = property.FindPropertyRelative("key").stringValue;
@@ -69,6 +87,12 @@ namespace ME.GD.Editor {
     [CustomPropertyDrawer(typeof(GDString))]
     public class GDStringDrawer : PropertyDrawer {
 
+        public override float GetPropertyHeight(UnityEditor.SerializedProperty property, GUIContent label) {
+            
+            return 18f;
+            
+        }
+
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label) {
 
             var gdKeyValue = property.FindPropertyRelative("key").stringValue;
@@ -88,6 +112,12 @@ namespace ME.GD.Editor {
 
     [CustomPropertyDrawer(typeof(GDKey))]
     public class GDKeyDrawer : PropertyDrawer {
+
+        public override float GetPropertyHeight(UnityEditor.SerializedProperty property, GUIContent label) {
+            
+            return 18f;
+            
+        }
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label) {
 
