@@ -5,9 +5,14 @@
 
         static GDSystemEditor() {
 
-            var gdSystem = new GDSystem();
-            GDSystem.SetActive(gdSystem);
-            gdSystem.Use(GDSystemEditor.GetMainData());
+            var data = GDSystemEditor.GetData();
+            for (int i = 0; i < data.Length; ++i) {
+                
+                var gdSystem = new GDSystem();
+                GDSystem.SetActive(gdSystem, data[i].index, data[i].name);
+                gdSystem.Use(data[i].data);
+                
+            }
 
         }
 
@@ -25,12 +30,12 @@
                 
             }
 
-            var sys = GDSystem.active;
+            var sys = GDSystem.GetActive(data.index);
             if (sys == null) {
 
                 sys = new GDSystem();
                 sys.Use(data);
-                GDSystem.SetActive(sys);
+                GDSystem.SetActive(sys, data.index, data.name);
 
             }
 
@@ -41,30 +46,38 @@
 
             }
             
-            return key.key + " = " + val;
+            return $"{key.key} = {val}";
 
         }
         
-        public static GDData GetMainData() {
+        public static GDSystemMonoBehaviour.DataItem[] GetData() {
 
             var mono = UnityEngine.Object.FindObjectOfType<GDSystemMonoBehaviour>();
             if (mono != null) {
 
-                return mono.data;
+                return mono.items;
 
             }
             
             var assets = UnityEditor.AssetDatabase.FindAssets("t:GDData");
             if (assets.Length > 0) {
 
-                var asset = assets[0];
-                var obj = UnityEditor.AssetDatabase.LoadAssetAtPath<GDData>(UnityEditor.AssetDatabase.GUIDToAssetPath(asset));
-                if (obj != null) {
+                var list = new System.Collections.Generic.List<GDSystemMonoBehaviour.DataItem>();
+                for (int i = 0; i < assets.Length; ++i) {
 
-                    return obj;
+                    var asset = assets[0];
+                    var obj = UnityEditor.AssetDatabase.LoadAssetAtPath<GDData>(UnityEditor.AssetDatabase.GUIDToAssetPath(asset));
+                    if (obj != null) {
+
+                        list.Add(new GDSystemMonoBehaviour.DataItem() {
+                            index = obj.index,
+                            data = obj,
+                        });
+
+                    }
 
                 }
-
+                
             }
 
             return null;

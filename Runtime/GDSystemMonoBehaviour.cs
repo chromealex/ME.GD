@@ -3,11 +3,24 @@ namespace ME.GD {
 
     public class GDSystemMonoBehaviour : UnityEngine.MonoBehaviour {
 
-        public string url;
-        public string version;
-        public GDData data;
-        private bool isReady;
-        private bool isLoading;
+        [System.Serializable]
+        public struct DataItem {
+
+            public string name;
+            public int index;
+            
+            public string url;
+            public string version;
+            public GDData data;
+
+            internal bool isReady;
+            internal bool isLoading;
+            
+        }
+
+        public DataItem[] items = new DataItem[0];
+        public int nextId;
+
         public bool showLogs;
         public bool updateOnStart;
 
@@ -15,58 +28,119 @@ namespace ME.GD {
 
             UnityEngine.GameObject.DontDestroyOnLoad(this.gameObject);
 
-            this.isReady = false;
+            this.SetReady(false);
             this.Init();
             if (this.updateOnStart == true) {
-                
-                this.StartCoroutine(this.UpdateData(GDSystem.active));
-                
+
+                for (int i = 0; i < this.items.Length; ++i) {
+
+                    this.StartCoroutine(this.UpdateData(this.items, i));
+
+                }
+
             } else {
+
+                this.Use();
+                this.SetReady(true);
                 
-                GDSystem.active.Use(this.data); 
-                this.isReady = true;
+            }
+            
+        }
+
+        public void SetLogs(bool state) {
+
+            for (int i = 0; i < this.items.Length; ++i) {
                 
+                GDSystem.GetActive(this.items[i].index).showLogs = state;
+                
+            }
+
+        }
+
+        public void Init() {
+
+            for (int i = 0; i < this.items.Length; ++i) {
+
+                var gdSystem = new GDSystem() {
+                    showLogs = this.showLogs,
+                };
+                GDSystem.SetActive(gdSystem, this.items[i].index, this.items[i].name);
+
+            }
+
+        }
+
+        internal void Use() {
+            
+            for (int i = 0; i < this.items.Length; ++i) {
+
+                GDSystem.GetActive(i).Use(this.items[i].data);
+
+            }
+            
+        }
+
+        internal void SetReady(bool state) {
+
+            for (int i = 0; i < this.items.Length; ++i) {
+
+                this.items[i].isReady = state;
+
+            }
+            
+        }
+
+        internal void SetLoading(bool state) {
+
+            for (int i = 0; i < this.items.Length; ++i) {
+
+                this.items[i].isLoading = state;
+
             }
             
         }
 
         public bool IsReady() {
 
-            return this.isReady;
+            for (int i = 0; i < this.items.Length; ++i) {
+
+                if (this.items[i].isReady == false) return false;
+
+            }
+            
+            return true;
 
         }
 
         public bool IsLoading() {
 
-            return this.isLoading;
+            for (int i = 0; i < this.items.Length; ++i) {
 
-        }
+                if (this.items[i].isLoading == false) return false;
 
-        public void Init() {
+            }
             
-            var gdSystem = new GDSystem() {
-                showLogs = this.showLogs
-            };
-            GDSystem.SetActive(gdSystem);
+            return true;
 
         }
-        
-        public System.Collections.IEnumerator UpdateData(GDSystem gdSystem) {
 
-            if (this.data == null) {
+        public System.Collections.IEnumerator UpdateData(DataItem[] items, int index) {
+
+            if (items[index].data == null) {
                 
                 if (this.showLogs == true) UnityEngine.Debug.LogWarning("[ME.GD] Data output is null. Please check `data` link on GD GameObject.");
                 yield break;
                 
             }
 
-            if (gdSystem.ApplyCache(this.version, this.data) == true) {
+            var gdSystem = GDSystem.GetActive(items[index].index);
+            if (gdSystem.ApplyCache(items[index].version, items[index].data) == true) {
                 
-                if (this.showLogs == true) UnityEngine.Debug.Log("[ME.GD] Cache read successfully");
+                if (this.showLogs == true) UnityEngine.Debug.Log($"[ME.GD] Cache read successfully from {gdSystem.GetCachePath()}");
                 try {
 
-                    gdSystem.Use(this.data);
-                    this.isReady = true;
+                    gdSystem.Use(items[index].data);
+                    items[index].isReady = true;
 
                 } catch (System.Exception ex) {
                     
@@ -76,15 +150,15 @@ namespace ME.GD {
                 
             }
             
-            this.isLoading = true;
+            items[index].isLoading = true;
 
-            var url = this.url.Replace("{streaming_assets}", UnityEngine.Application.streamingAssetsPath);
-            yield return gdSystem.DownloadAndUpdate(url, this.version, this.data, (result) => {
+            var url = items[index].url.Replace("{streaming_assets}", UnityEngine.Application.streamingAssetsPath);
+            yield return gdSystem.DownloadAndUpdate(url, items[index].version, items[index].data, (result) => {
 
                 try {
 
-                    gdSystem.Use(this.data);
-                    this.isReady = true;
+                    gdSystem.Use(items[index].data);
+                    items[index].isReady = true;
 
                 } catch (System.Exception ex) {
                     
@@ -94,11 +168,15 @@ namespace ME.GD {
 
                 if (result == false) {
                     
-                    if (this.showLogs == true) UnityEngine.Debug.LogError("Failed to load " + this.url + ", version: " + this.version);
+                    if (this.showLogs == true) UnityEngine.Debug.LogError($"Failed to load {items[index].url}, version: {items[index].version}");
+                    
+                } else {
+                    
+                    if (this.showLogs == true) UnityEngine.Debug.Log($"[ME.GD] Loaded {items[index].name} by index {items[index].index}");
                     
                 }
                 
-                this.isLoading = false;
+                items[index].isLoading = false;
                 
             });
 

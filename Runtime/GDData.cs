@@ -7,6 +7,7 @@ namespace ME.GD {
 
         public string version;
         public int fileVersion;
+        public int index;
         public List<Item> items = new List<Item>();
         
         internal void Clear() {

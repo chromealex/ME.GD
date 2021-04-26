@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace ME.GD {
 
@@ -31,6 +32,7 @@ namespace ME.GD {
     public struct GDEnum<T> : IGDEnum where T : struct, System.IConvertible {
 
         public string key;
+        public int index;
         [System.NonSerialized]
         public T runtimeValue;
         [System.NonSerialized]
@@ -40,10 +42,10 @@ namespace ME.GD {
             
             if (gdEnum.runtimeValueSet == true) return gdEnum.runtimeValue;
 
-            var gdKey = new GDKey() { key = gdEnum.key };
-            if (GDSystem.active.Get(gdKey, out string val) == true) {
+            var gdKey = new GDKey() { key = gdEnum.key, index = gdEnum.index };
+            if (GDSystem.GetActive(gdEnum.index).Get(gdKey, out string val) == true) {
 
-                if (GDSystem.active.GetEnumCache<TEnum>(gdKey.key, out var resEnum) == true) return resEnum;
+                if (GDSystem.GetActive(gdEnum.index).GetEnumCache<TEnum>(gdKey.key, out var resEnum) == true) return resEnum;
                 if (string.IsNullOrEmpty(val) == true) return default;
 
                 ulong valOut = default;
@@ -62,13 +64,13 @@ namespace ME.GD {
                 var res = System.Runtime.CompilerServices.Unsafe.As<ulong, TEnum>(ref valOut);
                 gdEnum.Set(res);
 
-                GDSystem.active.SetEnumCache(gdKey.key, res);
+                GDSystem.GetActive(gdEnum.index).SetEnumCache(gdKey.key, res);
                 
                 return res;
 
             }
 
-            if (GDSystem.active.Get(gdKey, out int valInt) == true) {
+            if (GDSystem.GetActive(gdEnum.index).Get(gdKey, out int valInt) == true) {
                 var res = System.Runtime.CompilerServices.Unsafe.As<int, TEnum>(ref valInt);
                 gdEnum.Set(res);
                 return res;
@@ -110,6 +112,7 @@ namespace ME.GD {
     public struct GDInt {
 
         public string key;
+        public int index;
         [System.NonSerialized]
         public int runtimeValue;
         [System.NonSerialized]
@@ -119,7 +122,7 @@ namespace ME.GD {
 
             if (this.runtimeValueSet == true) return this.runtimeValue;
 
-            if (GDSystem.active.Get(this, out int val) == true) {
+            if (GDSystem.GetActive(this.index).Get(this, out int val) == true) {
                 this.Set(val);
                 return val;
             }
@@ -160,6 +163,7 @@ namespace ME.GD {
     public struct GDString {
         
         public string key;
+        public int index;
         [System.NonSerialized]
         public string runtimeValue;
         [System.NonSerialized]
@@ -169,7 +173,7 @@ namespace ME.GD {
 
             if (this.runtimeValueSet == true) return this.runtimeValue;
 
-            if (GDSystem.active.Get(this, out string val) == true) {
+            if (GDSystem.GetActive(this.index).Get(this, out string val) == true) {
                 this.Set(val);
                 return val;
             }
@@ -204,6 +208,7 @@ namespace ME.GD {
     public struct GDFloat {
         
         public string key;
+        public int index;
         [System.NonSerialized]
         public float runtimeValue;
         [System.NonSerialized]
@@ -213,7 +218,7 @@ namespace ME.GD {
 
             if (this.runtimeValueSet == true) return this.runtimeValue;
             
-            if (GDSystem.active.Get(this, out float val) == true) {
+            if (GDSystem.GetActive(this.index).Get(this, out float val) == true) {
                 this.Set(val);
                 return val;
             }
@@ -254,26 +259,27 @@ namespace ME.GD {
     public struct GDKey {
 
         public string key;
+        public int index;
         [System.NonSerialized]
         public string runtimeValue;
 
         public float GetFloat() {
 
-            if (GDSystem.active.Get(this, out float val) == true) return val;
+            if (GDSystem.GetActive(this.index).Get(this, out float val) == true) return val;
             return default;
 
         }
 
         public int GetInt() {
 
-            if (GDSystem.active.Get(this, out int val) == true) return val;
+            if (GDSystem.GetActive(this.index).Get(this, out int val) == true) return val;
             return default;
 
         }
 
         public string GetString() {
 
-            if (GDSystem.active.Get(this, out string val) == true) return val;
+            if (GDSystem.GetActive(this.index).Get(this, out string val) == true) return val;
             return default;
 
         }
@@ -300,18 +306,22 @@ namespace ME.GD {
 
     public class GDSystem {
 
-        public static GDSystem active;
         private Dictionary<string, Item> lines = new Dictionary<string, Item>();
         private GDData data;
         public bool showLogs;
+        public int index = -1;
+        public string name;
+
+        public Dictionary<System.Type, EnumCacheBase> cache = new Dictionary<System.Type, EnumCacheBase>();
+        private static Dictionary<int, GDSystem> active = new Dictionary<int, GDSystem>();
 
         public abstract class EnumCacheBase {
 
         }
         
-        public class EnumCache<TEnum> : EnumCacheBase {
+        private class EnumCache<TEnum> : EnumCacheBase {
 
-            public Dictionary<string, TEnum> values = new Dictionary<string, TEnum>();
+            private Dictionary<string, TEnum> values = new Dictionary<string, TEnum>();
 
             public void Set(string key, TEnum val) {
                 
@@ -327,11 +337,39 @@ namespace ME.GD {
 
         }
 
-        public Dictionary<System.Type, EnumCacheBase> cache = new Dictionary<System.Type, EnumCacheBase>();
-        
-        public static void SetActive(GDSystem system) {
+        public static void SetActive(GDSystem system, int index, string name) {
 
-            GDSystem.active = system;
+            if (GDSystem.active.ContainsKey(index) == true) {
+
+                GDSystem.active[index] = system;
+                
+            } else {
+
+                GDSystem.active.Add(index, system);
+                
+            }
+
+            system.index = index;
+            system.name = name;
+
+        }
+
+        public static GDSystem GetActive(int index) {
+
+            if (GDSystem.active.TryGetValue(index, out var gdSystem) == true) {
+
+                gdSystem.index = index;
+                return gdSystem;
+                
+            }
+
+            return null;
+
+        }
+
+        public static GDSystem[] GetActiveSystems() {
+
+            return GDSystem.active.Values.ToArray();
 
         }
 
@@ -472,6 +510,7 @@ namespace ME.GD {
         public void Use(GDData data) {
 
             this.data = data;
+            this.data.index = this.index;
 
             this.lines.Clear();
             for (int i = 0; i < data.items.Count; ++i) {
@@ -503,7 +542,7 @@ namespace ME.GD {
 
                     if (fileVersionInt <= output.fileVersion && version == output.version) {
 
-                        if (this.showLogs == true) UnityEngine.Debug.Log("File " + output + " is up to date already, version: " + fileVersionInt);
+                        if (this.showLogs == true) UnityEngine.Debug.Log($"File {output} is up to date already, version: {fileVersionInt}");
                         return;
 
                     }
@@ -547,9 +586,10 @@ namespace ME.GD {
             }
 
             output.version = version;
+            output.index = this.index;
             output.SetDirty();
 
-            if (this.showLogs == true) UnityEngine.Debug.Log("[ME.GD] Updated version: " + output.fileVersion + ". Done");
+            if (this.showLogs == true) UnityEngine.Debug.Log($"[ME.GD] Updated version: {output.fileVersion}. Done");
 
         }
 
@@ -581,6 +621,8 @@ namespace ME.GD {
 
         public bool ApplyCache(string version, GDData data) {
             
+            if (this.index < 0) return false;
+            
             var cachePath = this.GetCachePath();
             if (System.IO.File.Exists(cachePath) == true) {
 
@@ -594,9 +636,9 @@ namespace ME.GD {
 
         }
         
-        private string GetCachePath() {
+        internal string GetCachePath() {
             
-            return $"{UnityEngine.Application.persistentDataPath}/ME.GD/DataCache.mec";
+            return $"{UnityEngine.Application.persistentDataPath}/ME.GD/DataCache{this.index}.mec";
             
         }
         

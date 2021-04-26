@@ -18,15 +18,18 @@ namespace ME.GD.Editor {
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label) {
 
             var gdKeyValue = property.FindPropertyRelative("key").stringValue;
+            var gdKeyIndex = property.FindPropertyRelative("index").intValue;
             var gdKeyValueRuntime = property.FindPropertyRelative("runtimeValue")?.floatValue;
-            var gdKey = new GDKey() { key = gdKeyValue, runtimeValue = gdKeyValueRuntime.ToString() };
+            var gdKey = new GDKey() { key = gdKeyValue, index = gdKeyIndex, runtimeValue = gdKeyValueRuntime.ToString() };
             GDKeyDrawer.DrawGUI(position, label, this.fieldInfo, GDValueType.Float, gdKey, property.hasMultipleDifferentValues, (key) => {
 
                 property.serializedObject.Update();
                 property.FindPropertyRelative("key").stringValue = key.key;
+                property.FindPropertyRelative("index").intValue = key.index;
                 property.serializedObject.ApplyModifiedProperties();
     
             });
+            property.FindPropertyRelative("index").intValue = gdKey.index;
 
         }
 
@@ -44,15 +47,18 @@ namespace ME.GD.Editor {
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label) {
 
             var gdKeyValue = property.FindPropertyRelative("key").stringValue;
+            var gdKeyIndex = property.FindPropertyRelative("index").intValue;
             var gdKeyValueRuntime = property.FindPropertyRelative("runtimeValue")?.enumValueIndex;
-            var gdKey = new GDKey() { key = gdKeyValue, runtimeValue = gdKeyValueRuntime.ToString() };
+            var gdKey = new GDKey() { key = gdKeyValue, index = gdKeyIndex, runtimeValue = gdKeyValueRuntime.ToString() };
             GDKeyDrawer.DrawGUI(position, label, this.fieldInfo, GDValueType.Enum, gdKey, property.hasMultipleDifferentValues, (key) => {
 
                 property.serializedObject.Update();
                 property.FindPropertyRelative("key").stringValue = key.key;
+                property.FindPropertyRelative("index").intValue = key.index;
                 property.serializedObject.ApplyModifiedProperties();
     
             });
+            property.FindPropertyRelative("index").intValue = gdKey.index;
 
         }
 
@@ -70,15 +76,18 @@ namespace ME.GD.Editor {
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label) {
 
             var gdKeyValue = property.FindPropertyRelative("key").stringValue;
+            var gdKeyIndex = property.FindPropertyRelative("index").intValue;
             var gdKeyValueRuntime = property.FindPropertyRelative("runtimeValue")?.intValue;
-            var gdKey = new GDKey() { key = gdKeyValue, runtimeValue = gdKeyValueRuntime.ToString() };
+            var gdKey = new GDKey() { key = gdKeyValue, index = gdKeyIndex, runtimeValue = gdKeyValueRuntime.ToString() };
             GDKeyDrawer.DrawGUI(position, label, this.fieldInfo, GDValueType.Integer, gdKey, property.hasMultipleDifferentValues, (key) => {
 
                 property.serializedObject.Update();
                 property.FindPropertyRelative("key").stringValue = key.key;
+                property.FindPropertyRelative("index").intValue = key.index;
                 property.serializedObject.ApplyModifiedProperties();
     
             });
+            property.FindPropertyRelative("index").intValue = gdKey.index;
 
         }
 
@@ -96,15 +105,18 @@ namespace ME.GD.Editor {
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label) {
 
             var gdKeyValue = property.FindPropertyRelative("key").stringValue;
+            var gdKeyIndex = property.FindPropertyRelative("index").intValue;
             var gdKeyValueRuntime = property.FindPropertyRelative("runtimeValue")?.stringValue;
-            var gdKey = new GDKey() { key = gdKeyValue, runtimeValue = gdKeyValueRuntime };
+            var gdKey = new GDKey() { key = gdKeyValue, index = gdKeyIndex, runtimeValue = gdKeyValueRuntime };
             GDKeyDrawer.DrawGUI(position, label, this.fieldInfo, GDValueType.String, gdKey, property.hasMultipleDifferentValues, (key) => {
 
                 property.serializedObject.Update();
                 property.FindPropertyRelative("key").stringValue = key.key;
+                property.FindPropertyRelative("index").intValue = key.index;
                 property.serializedObject.ApplyModifiedProperties();
     
             });
+            property.FindPropertyRelative("index").intValue = gdKey.index;
 
         }
 
@@ -122,15 +134,18 @@ namespace ME.GD.Editor {
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label) {
 
             var gdKeyValue = property.FindPropertyRelative("key").stringValue;
+            var gdKeyIndex = property.FindPropertyRelative("index").intValue;
             var gdKeyValueRuntime = property.FindPropertyRelative("runtimeValue")?.stringValue;
-            var gdKey = new GDKey() { key = gdKeyValue, runtimeValue = gdKeyValueRuntime };
+            var gdKey = new GDKey() { key = gdKeyValue, index = gdKeyIndex, runtimeValue = gdKeyValueRuntime };
             gdKey = GDKeyDrawer.DrawGUI(position, label, this.fieldInfo, gdKey, property.hasMultipleDifferentValues, (key) => {
 
                 property.serializedObject.Update();
                 property.FindPropertyRelative("key").stringValue = key.key;
+                property.FindPropertyRelative("index").intValue = key.index;
                 property.serializedObject.ApplyModifiedProperties();
     
             });
+            property.FindPropertyRelative("index").intValue = gdKey.index;
             
         }
 
@@ -146,12 +161,15 @@ namespace ME.GD.Editor {
 
         public static GDKey DrawGUI(Rect position, GUIContent label, System.Reflection.FieldInfo fieldInfo, GDValueType valueType, GDKey value, bool hasMultipleDifferentValues, System.Action<GDKey> onChanged) {
             
-            var mainData = GDSystem.active.GetData();
+            var mainData = GDSystem.GetActive(value.index).GetData();
             var attrType = valueType;
             const float offsetY = 2f;
+            const float gdTypeWidth = 80f;
 
             var labelField = new Rect(position.x + 2f, position.y + offsetY, EditorGUIUtility.labelWidth, position.height);
             var contentField = new Rect(position.x + EditorGUIUtility.labelWidth + 4f, position.y + offsetY, position.width - EditorGUIUtility.labelWidth - 8f, position.height);
+            var gdTypeField = new Rect(contentField.x + contentField.width - gdTypeWidth, contentField.y, gdTypeWidth, contentField.height);
+            contentField.width -= gdTypeWidth;
             EditorGUI.LabelField(labelField, label);
             var style = new GUIStyle(EditorStyles.textField);
             style.richText = true;
@@ -218,6 +236,11 @@ namespace ME.GD.Editor {
                 
             }
 
+            var systems = GDSystem.GetActiveSystems();
+            var labels = systems.Select(x => x.name).ToArray();
+            var values = systems.Select(x => x.index).ToArray();
+            value.index = EditorGUI.IntPopup(gdTypeField, "", value.index, labels, values);
+            
             return value;
 
         }
