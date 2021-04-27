@@ -74,7 +74,7 @@ namespace ME.GD {
             
             for (int i = 0; i < this.items.Length; ++i) {
 
-                GDSystem.GetActive(i).Use(this.items[i].data);
+                GDSystem.GetActive(this.items[i].index).Use(this.items[i].data);
 
             }
             
