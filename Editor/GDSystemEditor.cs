@@ -6,6 +6,10 @@
         static GDSystemEditor() {
 
             var data = GDSystemEditor.GetData();
+            if (data == null) {
+                UnityEngine.Debug.LogWarning("GDSystem::GetData failed");
+                return;
+            }
             for (int i = 0; i < data.Length; ++i) {
                 
                 var gdSystem = new GDSystem();
