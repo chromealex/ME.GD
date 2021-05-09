@@ -9,6 +9,9 @@ namespace ME.GD.Editor {
     [CustomPropertyDrawer(typeof(GDFloat))]
     public class GDFloatDrawer : PropertyDrawer {
 
+        private bool lastKeySet;
+        private GDKey lastKey;
+        
         public override float GetPropertyHeight(UnityEditor.SerializedProperty property, GUIContent label) {
             
             return 18f;
@@ -17,19 +20,23 @@ namespace ME.GD.Editor {
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label) {
 
+            if (this.lastKeySet == true) {
+
+                property.FindPropertyRelative("key").stringValue = this.lastKey.key;
+                property.FindPropertyRelative("index").intValue = this.lastKey.index;
+                GUI.changed = true;
+                this.lastKeySet = false;
+
+            }
             var gdKeyValue = property.FindPropertyRelative("key").stringValue;
             var gdKeyIndex = property.FindPropertyRelative("index").intValue;
             var gdKeyValueRuntime = property.FindPropertyRelative("runtimeValue")?.floatValue;
             var gdKey = new GDKey() { key = gdKeyValue, index = gdKeyIndex, runtimeValue = gdKeyValueRuntime.ToString() };
-            var prop = property.Copy();
             GDKeyDrawer.DrawGUI(position, label, this.fieldInfo, GDValueType.Float, gdKey, property.hasMultipleDifferentValues, (key) => {
 
-                prop = prop.serializedObject.FindProperty(prop.propertyPath);
-                prop.serializedObject.Update();
-                prop.FindPropertyRelative("key").stringValue = key.key;
-                prop.FindPropertyRelative("index").intValue = key.index;
-                prop.serializedObject.ApplyModifiedProperties();
-    
+                this.lastKeySet = true;
+                this.lastKey = key;
+
             });
             property.FindPropertyRelative("index").intValue = gdKey.index;
 
@@ -40,6 +47,9 @@ namespace ME.GD.Editor {
     [CustomPropertyDrawer(typeof(GDEnum<>))]
     public class GDEnumDrawer : PropertyDrawer {
 
+        private bool lastKeySet;
+        private GDKey lastKey;
+
         public override float GetPropertyHeight(UnityEditor.SerializedProperty property, GUIContent label) {
             
             return 18f;
@@ -48,19 +58,23 @@ namespace ME.GD.Editor {
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label) {
 
+            if (this.lastKeySet == true) {
+
+                property.FindPropertyRelative("key").stringValue = this.lastKey.key;
+                property.FindPropertyRelative("index").intValue = this.lastKey.index;
+                GUI.changed = true;
+                this.lastKeySet = false;
+
+            }
             var gdKeyValue = property.FindPropertyRelative("key").stringValue;
             var gdKeyIndex = property.FindPropertyRelative("index").intValue;
             var gdKeyValueRuntime = property.FindPropertyRelative("runtimeValue")?.enumValueIndex;
             var gdKey = new GDKey() { key = gdKeyValue, index = gdKeyIndex, runtimeValue = gdKeyValueRuntime.ToString() };
-            var prop = property.Copy();
             GDKeyDrawer.DrawGUI(position, label, this.fieldInfo, GDValueType.Enum, gdKey, property.hasMultipleDifferentValues, (key) => {
 
-                prop = prop.serializedObject.FindProperty(prop.propertyPath);
-                prop.serializedObject.Update();
-                prop.FindPropertyRelative("key").stringValue = key.key;
-                prop.FindPropertyRelative("index").intValue = key.index;
-                prop.serializedObject.ApplyModifiedProperties();
-    
+                this.lastKeySet = true;
+                this.lastKey = key;
+
             });
             property.FindPropertyRelative("index").intValue = gdKey.index;
 
@@ -71,6 +85,9 @@ namespace ME.GD.Editor {
     [CustomPropertyDrawer(typeof(GDInt))]
     public class GDIntDrawer : PropertyDrawer {
 
+        private bool lastKeySet;
+        private GDKey lastKey;
+
         public override float GetPropertyHeight(UnityEditor.SerializedProperty property, GUIContent label) {
             
             return 18f;
@@ -79,19 +96,23 @@ namespace ME.GD.Editor {
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label) {
 
+            if (this.lastKeySet == true) {
+
+                property.FindPropertyRelative("key").stringValue = this.lastKey.key;
+                property.FindPropertyRelative("index").intValue = this.lastKey.index;
+                GUI.changed = true;
+                this.lastKeySet = false;
+
+            }
             var gdKeyValue = property.FindPropertyRelative("key").stringValue;
             var gdKeyIndex = property.FindPropertyRelative("index").intValue;
             var gdKeyValueRuntime = property.FindPropertyRelative("runtimeValue")?.intValue;
             var gdKey = new GDKey() { key = gdKeyValue, index = gdKeyIndex, runtimeValue = gdKeyValueRuntime.ToString() };
-            var prop = property.Copy();
             GDKeyDrawer.DrawGUI(position, label, this.fieldInfo, GDValueType.Integer, gdKey, property.hasMultipleDifferentValues, (key) => {
 
-                prop = prop.serializedObject.FindProperty(prop.propertyPath);
-                prop.serializedObject.Update();
-                prop.FindPropertyRelative("key").stringValue = key.key;
-                prop.FindPropertyRelative("index").intValue = key.index;
-                prop.serializedObject.ApplyModifiedProperties();
-    
+                this.lastKeySet = true;
+                this.lastKey = key;
+
             });
             property.FindPropertyRelative("index").intValue = gdKey.index;
 
@@ -102,6 +123,9 @@ namespace ME.GD.Editor {
     [CustomPropertyDrawer(typeof(GDString))]
     public class GDStringDrawer : PropertyDrawer {
 
+        private bool lastKeySet;
+        private GDKey lastKey;
+
         public override float GetPropertyHeight(UnityEditor.SerializedProperty property, GUIContent label) {
             
             return 18f;
@@ -110,19 +134,23 @@ namespace ME.GD.Editor {
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label) {
 
+            if (this.lastKeySet == true) {
+
+                property.FindPropertyRelative("key").stringValue = this.lastKey.key;
+                property.FindPropertyRelative("index").intValue = this.lastKey.index;
+                GUI.changed = true;
+                this.lastKeySet = false;
+
+            }
             var gdKeyValue = property.FindPropertyRelative("key").stringValue;
             var gdKeyIndex = property.FindPropertyRelative("index").intValue;
             var gdKeyValueRuntime = property.FindPropertyRelative("runtimeValue")?.stringValue;
             var gdKey = new GDKey() { key = gdKeyValue, index = gdKeyIndex, runtimeValue = gdKeyValueRuntime };
-            var prop = property.Copy();
             GDKeyDrawer.DrawGUI(position, label, this.fieldInfo, GDValueType.String, gdKey, property.hasMultipleDifferentValues, (key) => {
 
-                prop = prop.serializedObject.FindProperty(prop.propertyPath);
-                prop.serializedObject.Update();
-                prop.FindPropertyRelative("key").stringValue = key.key;
-                prop.FindPropertyRelative("index").intValue = key.index;
-                prop.serializedObject.ApplyModifiedProperties();
-    
+                this.lastKeySet = true;
+                this.lastKey = key;
+
             });
             property.FindPropertyRelative("index").intValue = gdKey.index;
 
@@ -133,6 +161,9 @@ namespace ME.GD.Editor {
     [CustomPropertyDrawer(typeof(GDKey))]
     public class GDKeyDrawer : PropertyDrawer {
 
+        private bool lastKeySet;
+        private GDKey lastKey;
+
         public override float GetPropertyHeight(UnityEditor.SerializedProperty property, GUIContent label) {
             
             return 18f;
@@ -141,6 +172,14 @@ namespace ME.GD.Editor {
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label) {
 
+            if (this.lastKeySet == true) {
+
+                property.FindPropertyRelative("key").stringValue = this.lastKey.key;
+                property.FindPropertyRelative("index").intValue = this.lastKey.index;
+                GUI.changed = true;
+                this.lastKeySet = false;
+
+            }
             var gdKeyValue = property.FindPropertyRelative("key").stringValue;
             var gdKeyIndex = property.FindPropertyRelative("index").intValue;
             var gdKeyValueRuntime = property.FindPropertyRelative("runtimeValue")?.stringValue;
@@ -148,12 +187,9 @@ namespace ME.GD.Editor {
             var prop = property.Copy();
             gdKey = GDKeyDrawer.DrawGUI(position, label, this.fieldInfo, gdKey, property.hasMultipleDifferentValues, (key) => {
 
-                prop = prop.serializedObject.FindProperty(prop.propertyPath);
-                prop.serializedObject.Update();
-                prop.FindPropertyRelative("key").stringValue = key.key;
-                prop.FindPropertyRelative("index").intValue = key.index;
-                prop.serializedObject.ApplyModifiedProperties();
-    
+                this.lastKeySet = true;
+                this.lastKey = key;
+
             });
             property.FindPropertyRelative("index").intValue = gdKey.index;
             
