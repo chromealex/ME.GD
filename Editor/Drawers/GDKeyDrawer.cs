@@ -24,6 +24,7 @@ namespace ME.GD.Editor {
             var prop = property.Copy();
             GDKeyDrawer.DrawGUI(position, label, this.fieldInfo, GDValueType.Float, gdKey, property.hasMultipleDifferentValues, (key) => {
 
+                prop = prop.serializedObject.FindProperty(prop.propertyPath);
                 prop.serializedObject.Update();
                 prop.FindPropertyRelative("key").stringValue = key.key;
                 prop.FindPropertyRelative("index").intValue = key.index;
@@ -54,6 +55,7 @@ namespace ME.GD.Editor {
             var prop = property.Copy();
             GDKeyDrawer.DrawGUI(position, label, this.fieldInfo, GDValueType.Enum, gdKey, property.hasMultipleDifferentValues, (key) => {
 
+                prop = prop.serializedObject.FindProperty(prop.propertyPath);
                 prop.serializedObject.Update();
                 prop.FindPropertyRelative("key").stringValue = key.key;
                 prop.FindPropertyRelative("index").intValue = key.index;
@@ -84,6 +86,7 @@ namespace ME.GD.Editor {
             var prop = property.Copy();
             GDKeyDrawer.DrawGUI(position, label, this.fieldInfo, GDValueType.Integer, gdKey, property.hasMultipleDifferentValues, (key) => {
 
+                prop = prop.serializedObject.FindProperty(prop.propertyPath);
                 prop.serializedObject.Update();
                 prop.FindPropertyRelative("key").stringValue = key.key;
                 prop.FindPropertyRelative("index").intValue = key.index;
@@ -114,6 +117,7 @@ namespace ME.GD.Editor {
             var prop = property.Copy();
             GDKeyDrawer.DrawGUI(position, label, this.fieldInfo, GDValueType.String, gdKey, property.hasMultipleDifferentValues, (key) => {
 
+                prop = prop.serializedObject.FindProperty(prop.propertyPath);
                 prop.serializedObject.Update();
                 prop.FindPropertyRelative("key").stringValue = key.key;
                 prop.FindPropertyRelative("index").intValue = key.index;
@@ -144,6 +148,7 @@ namespace ME.GD.Editor {
             var prop = property.Copy();
             gdKey = GDKeyDrawer.DrawGUI(position, label, this.fieldInfo, gdKey, property.hasMultipleDifferentValues, (key) => {
 
+                prop = prop.serializedObject.FindProperty(prop.propertyPath);
                 prop.serializedObject.Update();
                 prop.FindPropertyRelative("key").stringValue = key.key;
                 prop.FindPropertyRelative("index").intValue = key.index;
