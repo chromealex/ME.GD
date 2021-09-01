@@ -206,8 +206,16 @@ namespace ME.GD.Editor {
         }
 
         public static GDKey DrawGUI(Rect position, GUIContent label, System.Reflection.FieldInfo fieldInfo, GDValueType valueType, GDKey value, bool hasMultipleDifferentValues, System.Action<GDKey> onChanged) {
+
+            var active = GDSystem.GetActive(value.index);
+            if (active == null) {
+                
+                GUI.Label(position, "GDSystem not found");
+                return value;
+                
+            }
             
-            var mainData = GDSystem.GetActive(value.index).GetData();
+            var mainData = active.GetData();
             var attrType = valueType;
             const float offsetY = 2f;
             const float gdTypeWidth = 80f;
