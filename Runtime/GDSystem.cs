@@ -306,13 +306,13 @@ namespace ME.GD {
 
     public class GDSystem {
 
-        private Dictionary<string, Item> lines = new Dictionary<string, Item>();
+        private System.Collections.Concurrent.ConcurrentDictionary<string, Item> lines = new System.Collections.Concurrent.ConcurrentDictionary<string, Item>();
         private GDData data;
         public bool showLogs;
         public int index = -1;
         public string name;
 
-        public Dictionary<System.Type, EnumCacheBase> cache = new Dictionary<System.Type, EnumCacheBase>();
+        public System.Collections.Concurrent.ConcurrentDictionary<System.Type, EnumCacheBase> cache = new System.Collections.Concurrent.ConcurrentDictionary<System.Type, EnumCacheBase>();
         private static Dictionary<int, GDSystem> active = new Dictionary<int, GDSystem>();
 
         public abstract class EnumCacheBase {
@@ -321,11 +321,11 @@ namespace ME.GD {
         
         private class EnumCache<TEnum> : EnumCacheBase {
 
-            private Dictionary<string, TEnum> values = new Dictionary<string, TEnum>();
+            private System.Collections.Concurrent.ConcurrentDictionary<string, TEnum> values = new System.Collections.Concurrent.ConcurrentDictionary<string, TEnum>();
 
             public void Set(string key, TEnum val) {
                 
-                this.values.Add(key, val);
+                this.values.TryAdd(key, val);
                 
             }
 
@@ -400,7 +400,7 @@ namespace ME.GD {
             if (this.cache.TryGetValue(type, out var cache) == false) {
 
                 cache = new EnumCache<T>();
-                this.cache.Add(type, cache);
+                this.cache.TryAdd(type, cache);
 
             }
 
@@ -516,7 +516,7 @@ namespace ME.GD {
             for (int i = 0; i < data.items.Count; ++i) {
 
                 var item = data.items[i];
-                this.lines.Add(item.key, item);
+                this.lines.TryAdd(item.key, item);
 
             }
 
